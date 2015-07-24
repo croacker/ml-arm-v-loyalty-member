@@ -44,7 +44,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.util.CurrentInstance;
 
 /**
- * A dummy implementation for the backend API.
+ *
  */
 public class DummyDataProvider implements DataProvider {
 
