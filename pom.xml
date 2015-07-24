@@ -225,6 +225,14 @@
 		</dependency>
 		<!--ML CMS-->
 
+		<!--ML Loyalty-->
+		<dependency>
+			<groupId>ru.peak.cms.project</groupId>
+			<artifactId>loyalty-common</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<!--ML Loyalty-->
+
 		<!--guice-->
 		<dependency>
 			<groupId>com.google.inject</groupId>
