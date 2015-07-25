@@ -20,7 +20,7 @@ public class TBDashboardEdit extends TestBenchTestCase {
     }
 
     public void save() {
-        scope.$(ButtonElement.class).caption("Save").first().click();
+        scope.$(ButtonElement.class).caption("Сохранить").first().click();
     }
 
 }

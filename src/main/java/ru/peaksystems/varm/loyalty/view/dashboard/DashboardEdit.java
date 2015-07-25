@@ -1,30 +1,19 @@
 package ru.peaksystems.varm.loyalty.view.dashboard;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
-/**
- * Simple name editor Window.
- */
 @SuppressWarnings("serial")
 public class DashboardEdit extends Window {
 
-    private final TextField nameField = new TextField("Name");
+    private final TextField nameField = new TextField("Наименование");
     private final DashboardEditListener listener;
 
     public DashboardEdit(final DashboardEditListener listener,
             final String currentName) {
         this.listener = listener;
-        setCaption("Edit Dashboard");
+        setCaption("Редактировать");
         setModal(true);
         setClosable(false);
         setResizable(false);
@@ -56,23 +45,15 @@ public class DashboardEdit extends Window {
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth(100.0f, Unit.PERCENTAGE);
 
-        Button cancel = new Button("Cancel");
-        cancel.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                close();
-            }
-        });
+        Button cancel = new Button("Отмена");
+        cancel.addClickListener(event -> close());
         cancel.setClickShortcut(KeyCode.ESCAPE, null);
 
-        Button save = new Button("Save");
+        Button save = new Button("Сохранить");
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                listener.dashboardNameEdited(nameField.getValue());
-                close();
-            }
+        save.addClickListener(event -> {
+            listener.dashboardNameEdited(nameField.getValue());
+            close();
         });
         save.setClickShortcut(KeyCode.ENTER, null);
 

@@ -1,14 +1,14 @@
 package ru.peaksystems.varm.loyalty.component;
 
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
+import ru.peaksystems.varm.loyalty.domain.Transaction;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-
-import ru.peaksystems.varm.loyalty.domain.Transaction;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 
 @SuppressWarnings("serial")
 public class TransactionsListing extends CssLayout {
@@ -16,7 +16,7 @@ public class TransactionsListing extends CssLayout {
     private final DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
 
     public TransactionsListing(final Collection<Transaction> transactions) {
-        addComponent(new Label("<strong>Selected transactions</strong>",
+        addComponent(new Label("<strong>Выбранные транзакции</strong>",
                 ContentMode.HTML));
 
         if (transactions != null) {
@@ -37,10 +37,10 @@ public class TransactionsListing extends CssLayout {
                 content.addStyleName("movie-title");
                 transationLayout.addComponent(content);
 
-                content = new Label("Seats: "
+                content = new Label("Места: "
                         + transaction.getSeats()
                         + "<br>"
-                        + "Revenue: $"
+                        + "Доход: $"
                         + new DecimalFormat("#.##").format(transaction
                                 .getPrice()), ContentMode.HTML);
                 content.setSizeUndefined();

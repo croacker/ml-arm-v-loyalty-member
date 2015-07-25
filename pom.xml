@@ -9,7 +9,7 @@
 	<properties>
 		<java.compiler.version>1.8</java.compiler.version>
 		<productionMode>false</productionMode>
-		<vaadin.version>7.5.1</vaadin.version>
+		<vaadin.version>7.5.2</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -67,38 +67,38 @@
 						</executions>
 					</plugin>
 
-					<plugin>
-						<groupId>org.eclipse.jetty</groupId>
-						<artifactId>jetty-maven-plugin</artifactId>
-						<version>9.2.3.v20140905</version>
-						<executions>
-							<!-- start and stop jetty (running our app) when running integration 
-								tests -->
-							<execution>
-								<id>start-jetty</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>start</goal>
-								</goals>
-								<configuration>
-									<scanIntervalSeconds>0</scanIntervalSeconds>
-									<stopKey>STOP</stopKey>
-									<stopPort>8866</stopPort>
-								</configuration>
-							</execution>
-							<execution>
-								<id>stop-jetty</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-								<configuration>
-									<stopKey>STOP</stopKey>
-									<stopPort>8866</stopPort>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
+					<!--<plugin>-->
+						<!--<groupId>org.eclipse.jetty</groupId>-->
+						<!--<artifactId>jetty-maven-plugin</artifactId>-->
+						<!--<version>9.2.3.v20140905</version>-->
+						<!--<executions>-->
+							<!--&lt;!&ndash; start and stop jetty (running our app) when running integration -->
+								<!--tests &ndash;&gt;-->
+							<!--<execution>-->
+								<!--<id>start-jetty</id>-->
+								<!--<phase>pre-integration-test</phase>-->
+								<!--<goals>-->
+									<!--<goal>start</goal>-->
+								<!--</goals>-->
+								<!--<configuration>-->
+									<!--<scanIntervalSeconds>0</scanIntervalSeconds>-->
+									<!--<stopKey>STOP</stopKey>-->
+									<!--<stopPort>8866</stopPort>-->
+								<!--</configuration>-->
+							<!--</execution>-->
+							<!--<execution>-->
+								<!--<id>stop-jetty</id>-->
+								<!--<phase>post-integration-test</phase>-->
+								<!--<goals>-->
+									<!--<goal>stop</goal>-->
+								<!--</goals>-->
+								<!--<configuration>-->
+									<!--<stopKey>STOP</stopKey>-->
+									<!--<stopPort>8866</stopPort>-->
+								<!--</configuration>-->
+							<!--</execution>-->
+						<!--</executions>-->
+					<!--</plugin>-->
 
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -335,6 +335,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<outputDirectory>${env.CATALINA_HOME}/webapps/</outputDirectory>
 					<warName>${war.name}</warName>
 					<webResources>
 						<webResource>

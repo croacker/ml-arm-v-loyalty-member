@@ -1,16 +1,5 @@
 package ru.peaksystems.varm.loyalty.view.transactions;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Set;
-
-import org.vaadin.maddon.FilterableListContainer;
-
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
@@ -18,13 +7,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.component.MovieDetailsWindow;
-import ru.peaksystems.varm.loyalty.domain.Transaction;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.TransactionReportEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
-import ru.peaksystems.varm.loyalty.view.DashboardViewType;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -36,20 +18,24 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.Table.TableDragMode;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import org.vaadin.maddon.FilterableListContainer;
+import ru.peaksystems.varm.loyalty.DashboardUI;
+import ru.peaksystems.varm.loyalty.component.MovieDetailsWindow;
+import ru.peaksystems.varm.loyalty.domain.Transaction;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.TransactionReportEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SuppressWarnings({ "serial", "unchecked" })
 public final class TransactionsView extends VerticalLayout implements View {
@@ -282,8 +268,8 @@ public final class TransactionsView extends VerticalLayout implements View {
     }
 
     void createNewReportFromSelection() {
-        UI.getCurrent().getNavigator()
-                .navigateTo(DashboardViewType.REPORTS.getViewName());
+//        UI.getCurrent().getNavigator()
+//                .navigateTo(DashboardViewType.REPORTS.getViewName());
         DashboardEventBus.post(new TransactionReportEvent(
                 (Collection<Transaction>) table.getValue()));
     }
@@ -305,7 +291,7 @@ public final class TransactionsView extends VerticalLayout implements View {
             if (action == report) {
                 createNewReportFromSelection();
             } else if (action == discard) {
-                Notification.show("Not implemented in this demo");
+                Notification.show("Не реализовано в этой версии");
             } else if (action == details) {
                 Item item = ((Table) sender).getItem(target);
                 if (item != null) {

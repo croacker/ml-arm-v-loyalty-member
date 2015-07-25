@@ -1,16 +1,16 @@
 package ru.peaksystems.varm.loyalty.data;
 
-import java.util.Collection;
-import java.util.Date;
-
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
 import ru.peaksystems.varm.loyalty.domain.Movie;
 import ru.peaksystems.varm.loyalty.domain.MovieRevenue;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
-import ru.peaksystems.varm.loyalty.domain.User;
+
+import java.util.Collection;
+import java.util.Date;
 
 /**
- * QuickTickets Dashboard backend API.
+ *
  */
 public interface DataProvider {
     /**
@@ -37,7 +37,7 @@ public interface DataProvider {
      * @param password
      * @return Authenticated used.
      */
-    User authenticate(String userName, String password);
+    MlUser authenticate(String userName, String password);
 
     /**
      * @return The number of unread notifications for the current user.

@@ -1,28 +1,16 @@
 package ru.peaksystems.varm.loyalty.component;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import ru.peaksystems.varm.loyalty.domain.Movie;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Responsive;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.peaksystems.varm.loyalty.domain.Movie;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public final class MovieDetailsWindow extends Window {
@@ -63,12 +51,7 @@ public final class MovieDetailsWindow extends Window {
 
         Button ok = new Button("Close");
         ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        ok.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                close();
-            }
-        });
+        ok.addClickListener(event -> close());
         ok.focus();
         footer.addComponent(ok);
         footer.setComponentAlignment(ok, Alignment.TOP_RIGHT);
@@ -107,43 +90,40 @@ public final class MovieDetailsWindow extends Window {
             df.applyPattern("dd-mm-yyyy");
             label = new Label(df.format(startTime));
             label.setSizeUndefined();
-            label.setCaption("Date");
+            label.setCaption("Дата");
             fields.addComponent(label);
 
             df.applyPattern("hh:mm a");
             label = new Label(df.format(startTime));
             label.setSizeUndefined();
-            label.setCaption("Starts");
+            label.setCaption("Начало");
             fields.addComponent(label);
         }
 
         if (endTime != null) {
             label = new Label(df.format(endTime));
             label.setSizeUndefined();
-            label.setCaption("Ends");
+            label.setCaption("Окончание");
             fields.addComponent(label);
         }
 
         label = new Label(movie.getDuration() + " minutes");
         label.setSizeUndefined();
-        label.setCaption("Duration");
+        label.setCaption("Продолжительность");
         fields.addComponent(label);
 
         synopsis.setData(movie.getSynopsis());
-        synopsis.setCaption("Synopsis");
+        synopsis.setCaption("Обзор");
         updateSynopsis(movie, false);
         fields.addComponent(synopsis);
 
-        final Button more = new Button("More…");
+        final Button more = new Button("Так же…");
         more.addStyleName(ValoTheme.BUTTON_LINK);
         fields.addComponent(more);
-        more.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                updateSynopsis(null, true);
-                event.getButton().setVisible(false);
-                MovieDetailsWindow.this.focus();
-            }
+        more.addClickListener(event -> {
+            updateSynopsis(null, true);
+            event.getButton().setVisible(false);
+            MovieDetailsWindow.this.focus();
         });
 
         return fields;

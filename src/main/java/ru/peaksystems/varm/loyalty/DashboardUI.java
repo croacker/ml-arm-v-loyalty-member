@@ -1,14 +1,19 @@
 package ru.peaksystems.varm.loyalty;
 
-import java.util.Locale;
-
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.server.Page;
+import com.vaadin.server.Responsive;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.data.DataProvider;
-import ru.peaksystems.varm.loyalty.data.dummy.DummyDataProvider;
-import ru.peaksystems.varm.loyalty.domain.User;
+import ru.peaksystems.varm.loyalty.data.dummy.LoyaltyDataProvider;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoggedOutEvent;
@@ -16,15 +21,8 @@ import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoginRequestedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import ru.peaksystems.varm.loyalty.view.LoginView;
 import ru.peaksystems.varm.loyalty.view.MainView;
-import com.vaadin.server.Page;
-import com.vaadin.server.Page.BrowserWindowResizeEvent;
-import com.vaadin.server.Page.BrowserWindowResizeListener;
-import com.vaadin.server.Responsive;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ValoTheme;
+
+import java.util.Locale;
 
 @Theme("dashboard")
 @Widgetset("ru.peaksystems.varm.loyalty.DashboardWidgetSet")
@@ -32,7 +30,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings("serial")
 public final class DashboardUI extends UI {
 
-    private final DataProvider dataProvider = new DummyDataProvider();
+    private final DataProvider dataProvider = new LoyaltyDataProvider();
     private final DashboardEventBus dashboardEventbus = new DashboardEventBus();
 
     @Override
@@ -46,20 +44,15 @@ public final class DashboardUI extends UI {
         updateContent();
 
         Page.getCurrent().addBrowserWindowResizeListener(
-                new BrowserWindowResizeListener() {
-                    @Override
-                    public void browserWindowResized(
-                            final BrowserWindowResizeEvent event) {
-                        DashboardEventBus.post(new BrowserResizeEvent());
-                    }
-                });
+            event -> DashboardEventBus.post(new BrowserResizeEvent()));
     }
 
     private void updateContent() {
-        User user = (User) VaadinSession.getCurrent().getAttribute(
-                User.class.getName());
-        if (user != null && "admin".equals(user.getRole())) {
-            // Authenticated user
+        MlUser user = (MlUser) VaadinSession.getCurrent().getAttribute(
+            MlUser.class.getName());
+        if (user != null
+//            && "admin".equals(user.getRole())
+            ){
             setContent(new MainView());
             removeStyleName("loginview");
             getNavigator().navigateTo(getNavigator().getState());
@@ -71,17 +64,14 @@ public final class DashboardUI extends UI {
 
     @Subscribe
     public void userLoginRequested(final UserLoginRequestedEvent event) {
-        User user = getDataProvider().authenticate(event.getUserName(),
+        MlUser user = getDataProvider().authenticate(event.getUserName(),
                 event.getPassword());
-        VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
+        VaadinSession.getCurrent().setAttribute(MlUser.class.getName(), user);
         updateContent();
     }
 
     @Subscribe
     public void userLoggedOut(final UserLoggedOutEvent event) {
-        // When the user logs out, current VaadinSession gets closed and the
-        // page gets reloaded on the login screen. Do notice the this doesn't
-        // invalidate the current HttpSession.
         VaadinSession.getCurrent().close();
         Page.getCurrent().reload();
     }
@@ -93,9 +83,6 @@ public final class DashboardUI extends UI {
         }
     }
 
-    /**
-     * @return An instance for accessing the (dummy) services layer.
-     */
     public static DataProvider getDataProvider() {
         return ((DashboardUI) getCurrent()).dataProvider;
     }

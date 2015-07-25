@@ -1,13 +1,6 @@
 package ru.peaksystems.varm.loyalty.view.reports;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.google.common.eventbus.Subscribe;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.ReportsCountUpdatedEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.TransactionReportEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -16,21 +9,19 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.CloseHandler;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.ReportsCountUpdatedEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.TransactionReportEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public final class ReportsView extends TabSheet implements View, CloseHandler,
@@ -105,7 +96,7 @@ public final class ReportsView extends TabSheet implements View, CloseHandler,
         delete.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(final ClickEvent event) {
-                Notification.show("Not implemented in this demo");
+                Notification.show("Не реализовано в этой версии");
             }
         });
         draftThumb.addComponent(delete);

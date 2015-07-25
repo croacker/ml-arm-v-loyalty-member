@@ -1,49 +1,19 @@
 package ru.peaksystems.varm.loyalty.view;
 
-import java.util.Collection;
-
 import com.google.common.eventbus.Subscribe;
-import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.component.ProfilePreferencesWindow;
-import ru.peaksystems.varm.loyalty.domain.Transaction;
-import ru.peaksystems.varm.loyalty.domain.User;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.NotificationsCountUpdatedEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.PostViewChangeEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.ProfileUpdatedEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.ReportsCountUpdatedEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.TransactionReportEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoggedOutEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
-import com.vaadin.event.dd.DragAndDropEvent;
-import com.vaadin.event.dd.DropHandler;
-import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractSelect.AcceptItem;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.DragAndDropWrapper;
-import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.Command;
+import com.vaadin.ui.*;
 import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.peak.ml.loyalty.core.data.MlUser;
+import ru.peaksystems.varm.loyalty.DashboardUI;
+import ru.peaksystems.varm.loyalty.component.UserProfilePreferencesWindow;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.*;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 
-/**
- * A responsive menu component providing user information and the controls for
- * primary navigation between the views.
- */
 @SuppressWarnings({ "serial", "unchecked" })
 public final class DashboardMenu extends CustomComponent {
 
@@ -60,8 +30,6 @@ public final class DashboardMenu extends CustomComponent {
         setId(ID);
         setSizeUndefined();
 
-        // There's only one DashboardMenu per UI so this doesn't need to be
-        // unregistered from the UI-scoped DashboardEventBus.
         DashboardEventBus.register(this);
 
         setCompositionRoot(buildContent());
@@ -85,7 +53,7 @@ public final class DashboardMenu extends CustomComponent {
     }
 
     private Component buildTitle() {
-        Label logo = new Label("QuickTickets <strong>Dashboard</strong>",
+        Label logo = new Label("Call-центр <strong>Лояльность</strong>",
                 ContentMode.HTML);
         logo.setSizeUndefined();
         HorizontalLayout logoWrapper = new HorizontalLayout(logo);
@@ -94,49 +62,31 @@ public final class DashboardMenu extends CustomComponent {
         return logoWrapper;
     }
 
-    private User getCurrentUser() {
-        return (User) VaadinSession.getCurrent().getAttribute(
-                User.class.getName());
+    private MlUser getCurrentUser() {
+        return (MlUser) VaadinSession.getCurrent().getAttribute(
+            MlUser.class.getName());
     }
 
     private Component buildUserMenu() {
         final MenuBar settings = new MenuBar();
         settings.addStyleName("user-menu");
-        final User user = getCurrentUser();
+        final MlUser user = getCurrentUser();
         settingsItem = settings.addItem("", new ThemeResource(
                 "img/profile-pic-300px.jpg"), null);
         updateUserName(null);
-        settingsItem.addItem("Edit Profile", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, false);
-            }
-        });
-        settingsItem.addItem("Preferences", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, true);
-            }
-        });
+        settingsItem.addItem("Редактировать профиль", selectedItem -> UserProfilePreferencesWindow.open(user, false));
+        settingsItem.addItem("Параметры", selectedItem -> UserProfilePreferencesWindow.open(user, true));
         settingsItem.addSeparator();
-        settingsItem.addItem("Sign Out", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                DashboardEventBus.post(new UserLoggedOutEvent());
-            }
-        });
+        settingsItem.addItem("Выйти", selectedItem -> DashboardEventBus.post(new UserLoggedOutEvent()));
         return settings;
     }
 
     private Component buildToggleButton() {
-        Button valoMenuToggleButton = new Button("Menu", new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                if (getCompositionRoot().getStyleName().contains(STYLE_VISIBLE)) {
-                    getCompositionRoot().removeStyleName(STYLE_VISIBLE);
-                } else {
-                    getCompositionRoot().addStyleName(STYLE_VISIBLE);
-                }
+        Button valoMenuToggleButton = new Button("Меню", event -> {
+            if (getCompositionRoot().getStyleName().contains(STYLE_VISIBLE)) {
+                getCompositionRoot().removeStyleName(STYLE_VISIBLE);
+            } else {
+                getCompositionRoot().addStyleName(STYLE_VISIBLE);
             }
         });
         valoMenuToggleButton.setIcon(FontAwesome.LIST);
@@ -153,34 +103,33 @@ public final class DashboardMenu extends CustomComponent {
         for (final DashboardViewType view : DashboardViewType.values()) {
             Component menuItemComponent = new ValoMenuItemButton(view);
 
-            if (view == DashboardViewType.REPORTS) {
-                // Add drop target to reports button
-                DragAndDropWrapper reports = new DragAndDropWrapper(
-                        menuItemComponent);
-                reports.setSizeUndefined();
-                reports.setDragStartMode(DragStartMode.NONE);
-                reports.setDropHandler(new DropHandler() {
-
-                    @Override
-                    public void drop(final DragAndDropEvent event) {
-                        UI.getCurrent()
-                                .getNavigator()
-                                .navigateTo(
-                                        DashboardViewType.REPORTS.getViewName());
-                        Table table = (Table) event.getTransferable()
-                                .getSourceComponent();
-                        DashboardEventBus.post(new TransactionReportEvent(
-                                (Collection<Transaction>) table.getValue()));
-                    }
-
-                    @Override
-                    public AcceptCriterion getAcceptCriterion() {
-                        return AcceptItem.ALL;
-                    }
-
-                });
-                menuItemComponent = reports;
-            }
+//            if (view == DashboardViewType.REPORTS) {
+//                DragAndDropWrapper reports = new DragAndDropWrapper(
+//                        menuItemComponent);
+//                reports.setSizeUndefined();
+//                reports.setDragStartMode(DragStartMode.NONE);
+//                reports.setDropHandler(new DropHandler() {
+//
+//                    @Override
+//                    public void drop(final DragAndDropEvent event) {
+//                        UI.getCurrent()
+//                                .getNavigator()
+//                                .navigateTo(
+//                                        DashboardViewType.REPORTS.getViewName());
+//                        Table table = (Table) event.getTransferable()
+//                                .getSourceComponent();
+//                        DashboardEventBus.post(new TransactionReportEvent(
+//                                (Collection<Transaction>) table.getValue()));
+//                    }
+//
+//                    @Override
+//                    public AcceptCriterion getAcceptCriterion() {
+//                        return AcceptItem.ALL;
+//                    }
+//
+//                });
+//                menuItemComponent = reports;
+//            }
 
             if (view == DashboardViewType.DASHBOARD) {
                 notificationsBadge = new Label();
@@ -188,12 +137,12 @@ public final class DashboardMenu extends CustomComponent {
                 menuItemComponent = buildBadgeWrapper(menuItemComponent,
                         notificationsBadge);
             }
-            if (view == DashboardViewType.REPORTS) {
-                reportsBadge = new Label();
-                reportsBadge.setId(REPORTS_BADGE_ID);
-                menuItemComponent = buildBadgeWrapper(menuItemComponent,
-                        reportsBadge);
-            }
+//            if (view == DashboardViewType.REPORTS) {
+//                reportsBadge = new Label();
+//                reportsBadge.setId(REPORTS_BADGE_ID);
+//                menuItemComponent = buildBadgeWrapper(menuItemComponent,
+//                        reportsBadge);
+//            }
 
             menuItemsLayout.addComponent(menuItemComponent);
         }
@@ -221,7 +170,6 @@ public final class DashboardMenu extends CustomComponent {
 
     @Subscribe
     public void postViewChange(final PostViewChangeEvent event) {
-        // After a successful view change the menu can be hidden in mobile view.
         getCompositionRoot().removeStyleName(STYLE_VISIBLE);
     }
 
@@ -242,7 +190,7 @@ public final class DashboardMenu extends CustomComponent {
 
     @Subscribe
     public void updateUserName(final ProfileUpdatedEvent event) {
-        User user = getCurrentUser();
+        MlUser user = getCurrentUser();
         settingsItem.setText(user.getFirstName() + " " + user.getLastName());
     }
 
@@ -266,7 +214,6 @@ public final class DashboardMenu extends CustomComponent {
                             .navigateTo(view.getViewName());
                 }
             });
-
         }
 
         @Subscribe

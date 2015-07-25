@@ -1,11 +1,11 @@
 package ru.peaksystems.varm.loyalty.data.dummy;
 
+import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
-
-public abstract class DummyDataGenerator {
+public abstract class LoyaltyDataGenerator {
 
     static String randomFirstName() {
         String[] names = { "Dave", "Mike", "Katherine", "Jonas", "Linus",
@@ -126,16 +126,16 @@ public abstract class DummyDataGenerator {
         n1.setId(1);
         n1.setFirstName(randomFirstName());
         n1.setLastName(randomLastName());
-        n1.setAction("created a new report");
-        n1.setPrettyTime("25 minutes ago");
+        n1.setAction("Новый отчет создан");
+        n1.setPrettyTime("25 минут назад");
         n1.setContent(randomText(18));
 
         DashboardNotification n2 = new DashboardNotification();
         n2.setId(2);
         n2.setFirstName(randomFirstName());
         n2.setLastName(randomLastName());
-        n2.setAction("changed the schedule");
-        n2.setPrettyTime("2 days ago");
+        n2.setAction("Изменено задание");
+        n2.setPrettyTime("2 дня назад");
         n2.setContent(randomText(10));
 
         return Arrays.asList(n1, n2);

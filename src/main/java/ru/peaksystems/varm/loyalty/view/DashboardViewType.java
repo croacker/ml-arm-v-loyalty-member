@@ -1,19 +1,19 @@
 package ru.peaksystems.varm.loyalty.view;
 
-import ru.peaksystems.varm.loyalty.view.dashboard.DashboardView;
-import ru.peaksystems.varm.loyalty.view.reports.ReportsView;
-import ru.peaksystems.varm.loyalty.view.schedule.ScheduleView;
-import ru.peaksystems.varm.loyalty.view.transactions.TransactionsView;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import ru.peaksystems.varm.loyalty.view.dashboard.DashboardView;
 
 public enum DashboardViewType {
-    DASHBOARD("dashboard", DashboardView.class, FontAwesome.HOME, true), SALES(
-            "sales", DashboardView.class, FontAwesome.BAR_CHART_O, false), TRANSACTIONS(
-            "transactions", TransactionsView.class, FontAwesome.TABLE, false), REPORTS(
-            "reports", ReportsView.class, FontAwesome.FILE_TEXT_O, true), SCHEDULE(
-            "schedule", ScheduleView.class, FontAwesome.CALENDAR_O, false);
+
+    DASHBOARD("dashboard", DashboardView.class, FontAwesome.HOME, true)
+//    ,
+//    SALES("sales", DashboardView.class, FontAwesome.BAR_CHART_O, false),
+//    TRANSACTIONS("transactions", TransactionsView.class, FontAwesome.TABLE, false),
+//    REPORTS("reports", ReportsView.class, FontAwesome.FILE_TEXT_O, true),
+//    SCHEDULE("schedule", ScheduleView.class, FontAwesome.CALENDAR_O, false)
+    ;
 
     private final String viewName;
     private final Class<? extends View> viewClass;

@@ -1,57 +1,38 @@
 package ru.peaksystems.varm.loyalty.data.dummy;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.util.CurrentInstance;
+import ru.ml.core.common.guice.GuiceConfigSingleton;
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.data.DataProvider;
 import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
 import ru.peaksystems.varm.loyalty.domain.Movie;
 import ru.peaksystems.varm.loyalty.domain.MovieRevenue;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
-import ru.peaksystems.varm.loyalty.domain.User;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.util.CurrentInstance;
+import ru.peaksystems.varm.loyalty.service.SecurityServiceV;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  *
  */
-public class DummyDataProvider implements DataProvider {
+public class LoyaltyDataProvider implements DataProvider {
 
     // TODO: Get API key from http://developer.rottentomatoes.com
     private static final String ROTTEN_TOMATOES_API_KEY = null;
 
-    /* List of countries and cities for them */
     private static Multimap<String, String> countryToCities;
     private static Date lastDataUpdate;
     private static Collection<Movie> movies;
@@ -60,13 +41,22 @@ public class DummyDataProvider implements DataProvider {
 
     private static Random rand = new Random();
 
-    private final Collection<DashboardNotification> notifications = DummyDataGenerator
+    private final Collection<DashboardNotification> notifications = LoyaltyDataGenerator
             .randomNotifications();
+
+    private SecurityServiceV securityService;
+
+    private SecurityServiceV getSecurityService() {
+        if (securityService == null) {
+            securityService = GuiceConfigSingleton.inject(SecurityServiceV.class);
+        }
+        return securityService;
+    }
 
     /**
      * Initialize the data for this application.
      */
-    public DummyDataProvider() {
+    public LoyaltyDataProvider() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
         if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
@@ -259,7 +249,7 @@ public class DummyDataProvider implements DataProvider {
         /* First, read the text file into a string */
         StringBuffer fileData = new StringBuffer(2000);
         BufferedReader reader = new BufferedReader(new InputStreamReader(
-                DummyDataProvider.class.getResourceAsStream("cities.txt")));
+                LoyaltyDataProvider.class.getResourceAsStream("cities.txt")));
 
         char[] buf = new char[1024];
         int numRead = 0;
@@ -384,19 +374,8 @@ public class DummyDataProvider implements DataProvider {
     }
 
     @Override
-    public User authenticate(String userName, String password) {
-        User user = new User();
-        user.setFirstName(DummyDataGenerator.randomFirstName());
-        user.setLastName(DummyDataGenerator.randomLastName());
-        user.setRole("admin");
-        String email = user.getFirstName().toLowerCase() + "."
-                + user.getLastName().toLowerCase() + "@"
-                + DummyDataGenerator.randomCompanyName().toLowerCase() + ".com";
-        user.setEmail(email.replaceAll(" ", ""));
-        user.setLocation(DummyDataGenerator.randomWord(5, true));
-        user.setBio("Quis aute iure reprehenderit in voluptate velit esse."
-                + "Cras mattis iudicium purus sit amet fermentum.");
-        return user;
+    public MlUser authenticate(String userName, String password) {
+        return getSecurityService().authenticateMember(userName, password);
     }
 
     @Override

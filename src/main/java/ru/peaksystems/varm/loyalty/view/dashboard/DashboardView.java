@@ -1,15 +1,6 @@
 package ru.peaksystems.varm.loyalty.view.dashboard;
 
 import com.google.common.eventbus.Subscribe;
-import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.component.TopTenMoviesTable;
-import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.NotificationsCountUpdatedEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
-import ru.peaksystems.varm.loyalty.view.dashboard.DashboardEdit.DashboardEditListener;
-import com.vaadin.event.LayoutEvents.LayoutClickEvent;
-import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -21,6 +12,15 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.peaksystems.varm.loyalty.DashboardUI;
+import ru.peaksystems.varm.loyalty.component.CardHolderOperationsTable;
+import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.NotificationsCountUpdatedEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+import ru.peaksystems.varm.loyalty.layout.CardholderInfoLayout;
+import ru.peaksystems.varm.loyalty.layout.CardholderSearchLayout;
+import ru.peaksystems.varm.loyalty.view.dashboard.DashboardEdit.DashboardEditListener;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -58,14 +58,7 @@ public final class DashboardView extends Panel implements View,
         root.addComponent(content);
         root.setExpandRatio(content, 1);
 
-        // All the open sub-windows should be closed whenever the root layout
-        // gets clicked.
-        root.addLayoutClickListener(new LayoutClickListener() {
-            @Override
-            public void layoutClick(final LayoutClickEvent event) {
-                DashboardEventBus.post(new CloseOpenWindowsEvent());
-            }
-        });
+        root.addLayoutClickListener(event -> DashboardEventBus.post(new CloseOpenWindowsEvent()));
     }
 
     private Component buildSparklines() {
@@ -82,7 +75,7 @@ public final class DashboardView extends Panel implements View,
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        titleLabel = new Label("Dashboard");
+        titleLabel = new Label("Рабочий стол");
         titleLabel.setId(TITLE_ID);
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
@@ -101,12 +94,7 @@ public final class DashboardView extends Panel implements View,
 
     private NotificationsButton buildNotificationsButton() {
         NotificationsButton result = new NotificationsButton();
-        result.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                openNotificationsPopup(event);
-            }
-        });
+        result.addClickListener(event -> openNotificationsPopup(event));
         return result;
     }
 
@@ -116,15 +104,10 @@ public final class DashboardView extends Panel implements View,
         result.setIcon(FontAwesome.EDIT);
         result.addStyleName("icon-edit");
         result.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-        result.setDescription("Edit Dashboard");
-        result.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                getUI().addWindow(
-                        new DashboardEdit(DashboardView.this, titleLabel
-                                .getValue()));
-            }
-        });
+        result.setDescription("Редактировать");
+        result.addClickListener(event -> getUI().addWindow(
+                new DashboardEdit(DashboardView.this, titleLabel
+                        .getValue())));
         return result;
     }
 
@@ -133,30 +116,24 @@ public final class DashboardView extends Panel implements View,
         dashboardPanels.addStyleName("dashboard-panels");
         Responsive.makeResponsive(dashboardPanels);
 
-        dashboardPanels.addComponent(buildTopGrossingMovies());
-        dashboardPanels.addComponent(buildNotes());
+        dashboardPanels.addComponent(buildSearchHolder());
+        dashboardPanels.addComponent(buildCardholderInfo());
         dashboardPanels.addComponent(buildTop10TitlesByRevenue());
-        dashboardPanels.addComponent(buildPopularMovies());
+//        dashboardPanels.addComponent(buildPopularMovies());
 
         return dashboardPanels;
     }
 
-    private Component buildTopGrossingMovies() {
-        return createContentWrapper(new HorizontalLayout());
+    private Component buildSearchHolder() {
+        return createContentWrapper(new CardholderSearchLayout());
     }
 
-    private Component buildNotes() {
-        TextArea notes = new TextArea("Notes");
-        notes.setValue("Remember to:\n· Zoom in and out in the Sales view\n· Filter the transactions and drag a set of them to the Reports tab\n· Create a new report\n· Change the schedule of the movie theater");
-        notes.setSizeFull();
-        notes.addStyleName(ValoTheme.TEXTAREA_BORDERLESS);
-        Component panel = createContentWrapper(notes);
-        panel.addStyleName("notes");
-        return panel;
+    private Component buildCardholderInfo() {
+        return createContentWrapper(new CardholderInfoLayout());
     }
 
     private Component buildTop10TitlesByRevenue() {
-        Component contentWrapper = createContentWrapper(new TopTenMoviesTable());
+        Component contentWrapper = createContentWrapper(new CardHolderOperationsTable());
         contentWrapper.addStyleName("top10-revenue");
         return contentWrapper;
     }
@@ -186,33 +163,25 @@ public final class DashboardView extends Panel implements View,
 
         MenuBar tools = new MenuBar();
         tools.addStyleName(ValoTheme.MENUBAR_BORDERLESS);
-        MenuItem max = tools.addItem("", FontAwesome.EXPAND, new Command() {
-
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                if (!slot.getStyleName().contains("max")) {
-                    selectedItem.setIcon(FontAwesome.COMPRESS);
-                    toggleMaximized(slot, true);
-                } else {
-                    slot.removeStyleName("max");
-                    selectedItem.setIcon(FontAwesome.EXPAND);
-                    toggleMaximized(slot, false);
-                }
+        MenuItem max = tools.addItem("", FontAwesome.EXPAND,
+            selectedItem -> {
+            if (!slot.getStyleName().contains("max")) {
+                selectedItem.setIcon(FontAwesome.COMPRESS);
+                toggleMaximized(slot, true);
+            } else {
+                slot.removeStyleName("max");
+                selectedItem.setIcon(FontAwesome.EXPAND);
+                toggleMaximized(slot, false);
             }
         });
         max.setStyleName("icon-only");
         MenuItem root = tools.addItem("", FontAwesome.COG, null);
-        root.addItem("Configure", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                Notification.show("Not implemented in this demo");
-            }
-        });
+        root.addItem("Редактировать", selectedItem -> Notification.show("Не реализовано в этой версии"));
         root.addSeparator();
-        root.addItem("Close", new Command() {
+        root.addItem("Закрыть", new Command() {
             @Override
             public void menuSelected(final MenuItem selectedItem) {
-                Notification.show("Not implemented in this demo");
+                Notification.show("Не реализовано в этой версии");
             }
         });
 
@@ -230,7 +199,7 @@ public final class DashboardView extends Panel implements View,
         notificationsLayout.setMargin(true);
         notificationsLayout.setSpacing(true);
 
-        Label title = new Label("Notifications");
+        Label title = new Label("Напоминания");
         title.addStyleName(ValoTheme.LABEL_H3);
         title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         notificationsLayout.addComponent(title);
@@ -262,11 +231,11 @@ public final class DashboardView extends Panel implements View,
         HorizontalLayout footer = new HorizontalLayout();
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth("100%");
-        Button showAll = new Button("View All Notifications",
+        Button showAll = new Button("Все напоминания",
                 new ClickListener() {
                     @Override
                     public void buttonClick(final ClickEvent event) {
-                        Notification.show("Not implemented in this demo");
+                        Notification.show("Не реализовано");
                     }
                 });
         showAll.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
@@ -347,7 +316,7 @@ public final class DashboardView extends Panel implements View,
         public void setUnreadCount(final int count) {
             setCaption(String.valueOf(count));
 
-            String description = "Notifications";
+            String description = "Напоминания";
             if (count > 0) {
                 addStyleName(STYLE_UNREAD);
                 description += " (" + count + " unread)";

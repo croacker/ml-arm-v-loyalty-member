@@ -3,7 +3,7 @@ package ru.peaksystems.varm.loyalty.view.reports;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import ru.peaksystems.varm.loyalty.component.InlineTextEditor;
-import ru.peaksystems.varm.loyalty.component.TopTenMoviesTable;
+import ru.peaksystems.varm.loyalty.component.CardHolderOperationsTable;
 import ru.peaksystems.varm.loyalty.component.TransactionsListing;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
@@ -175,7 +175,7 @@ public final class ReportEditor extends VerticalLayout {
                         prefillData != null ? String.valueOf(prefillData)
                                 : null);
             } else if (type == PaletteItemType.TABLE) {
-                result = new TopTenMoviesTable();
+                result = new CardHolderOperationsTable();
             } else if (type == PaletteItemType.CHART) {
                 result = new Table();
             } else if (type == PaletteItemType.TRANSACTIONS) {

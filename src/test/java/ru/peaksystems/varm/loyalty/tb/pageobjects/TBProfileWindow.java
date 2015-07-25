@@ -2,7 +2,7 @@ package ru.peaksystems.varm.loyalty.tb.pageobjects;
 
 import org.openqa.selenium.WebDriver;
 
-import ru.peaksystems.varm.loyalty.component.ProfilePreferencesWindow;
+import ru.peaksystems.varm.loyalty.component.UserProfilePreferencesWindow;
 import com.vaadin.testbench.TestBenchTestCase;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.TextFieldElement;
@@ -14,7 +14,7 @@ public class TBProfileWindow extends TestBenchTestCase {
 
     public TBProfileWindow(WebDriver driver) {
         setDriver(driver);
-        scope = $(WindowElement.class).id(ProfilePreferencesWindow.ID);
+        scope = $(WindowElement.class).id(UserProfilePreferencesWindow.ID);
     }
 
     public void setName(String firstName, String lastName) {
