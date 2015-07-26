@@ -103,7 +103,7 @@ public class LoginView extends VerticalLayout {
             if (user != null) {
                 DashboardEventBus.post(new UserLoginRequestedEvent(userName, password));
             } else {
-                showError("Неверное имя пользователя либо пароль. <span>Попробуйте admin, admin</span>");
+                showError("Неверное имя пользователя либо пароль.");
             }
         }
     }
@@ -120,7 +120,7 @@ public class LoginView extends VerticalLayout {
         notification.setHtmlContentAllowed(true);
         notification.setStyleName("tray dark small closable login-help");
         notification.setPosition(Position.BOTTOM_CENTER);
-        notification.setDelayMsec(10000);
+        notification.setDelayMsec(5000);
         notification.show(Page.getCurrent());
     }
 

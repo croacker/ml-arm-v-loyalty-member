@@ -149,7 +149,7 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     private Collection getCardOperations(){
 //        return getCardOperationDao().getByHolder((Holder) filterParameters.get("currentHolder"));
-        return getCardOperationDao().getAll(CardOperation.class);
+        return getCardOperationDao().getLast(20);
     }
 
     @Override
