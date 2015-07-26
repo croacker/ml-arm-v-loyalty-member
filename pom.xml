@@ -67,39 +67,6 @@
 						</executions>
 					</plugin>
 
-					<!--<plugin>-->
-						<!--<groupId>org.eclipse.jetty</groupId>-->
-						<!--<artifactId>jetty-maven-plugin</artifactId>-->
-						<!--<version>9.2.3.v20140905</version>-->
-						<!--<executions>-->
-							<!--&lt;!&ndash; start and stop jetty (running our app) when running integration -->
-								<!--tests &ndash;&gt;-->
-							<!--<execution>-->
-								<!--<id>start-jetty</id>-->
-								<!--<phase>pre-integration-test</phase>-->
-								<!--<goals>-->
-									<!--<goal>start</goal>-->
-								<!--</goals>-->
-								<!--<configuration>-->
-									<!--<scanIntervalSeconds>0</scanIntervalSeconds>-->
-									<!--<stopKey>STOP</stopKey>-->
-									<!--<stopPort>8866</stopPort>-->
-								<!--</configuration>-->
-							<!--</execution>-->
-							<!--<execution>-->
-								<!--<id>stop-jetty</id>-->
-								<!--<phase>post-integration-test</phase>-->
-								<!--<goals>-->
-									<!--<goal>stop</goal>-->
-								<!--</goals>-->
-								<!--<configuration>-->
-									<!--<stopKey>STOP</stopKey>-->
-									<!--<stopPort>8866</stopPort>-->
-								<!--</configuration>-->
-							<!--</execution>-->
-						<!--</executions>-->
-					<!--</plugin>-->
-
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
@@ -369,8 +336,6 @@
 
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

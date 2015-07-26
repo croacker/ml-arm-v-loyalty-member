@@ -15,6 +15,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.Holder;
+import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import ru.peaksystems.varm.loyalty.service.LoyaltyPersistServiceV;
@@ -114,18 +115,25 @@ public class HolderProfilePreferencesWindow extends Window {
         root.setExpandRatio(details, 1);
 
         socialCardNumberField = new TextField("Номер социальной карты");
+        socialCardNumberField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(socialCardNumberField);
         lastNameField = new TextField("Фамилия");
+        lastNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(lastNameField);
         firstNameField = new TextField("Имя");
+        firstNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(firstNameField);
         secondNameField = new TextField("Отчество");
+        secondNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(secondNameField);
         emailField = new TextField("Email");
+        emailField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(emailField);
         phoneField = new TextField("Телефон");
+        phoneField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(emailField);
         checkwordField = new TextField("Проверочное слово");
+        checkwordField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(checkwordField);
 
         return root;
@@ -150,7 +158,7 @@ public class HolderProfilePreferencesWindow extends Window {
                 success.setPosition(Position.BOTTOM_CENTER);
                 success.show(Page.getCurrent());
 
-                DashboardEventBus.post(new DashboardEvent.ProfileUpdatedEvent());
+                DashboardEventBus.post(new DashboardEvent.CardholderUpdateEvent(this.holder));
                 close();
             } catch (FieldGroup.CommitException e) {
                 Notification.show("Ошибка обновления профиля держателя",

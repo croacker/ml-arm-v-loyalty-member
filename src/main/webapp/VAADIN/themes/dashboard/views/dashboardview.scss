@@ -75,6 +75,8 @@
       }
 
       .top10-revenue {
+        width: 100% !important;
+
         .card {
           padding-left: 0;
           padding-right: 0;
@@ -132,6 +134,42 @@
   	  }
 
       .dashboard-panel-slot.max {
+        width: 100% !important;
+        height: 100%;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .dashboard-panel-slot-table {
+      padding: round($view-padding / 3);
+      min-height: 220px;
+    }
+
+      &[width-range~="0-700px"] {
+        .dashboard-panel-slot-table {
+          width: 100% !important;
+        }
+      }
+
+      &[width-range~="701px-"] {
+        .dashboard-panel-slot-table {
+          width: 100% !important;
+        }
+      }
+
+      &[height-range~="0-440px"] {
+        .dashboard-panel-slot-table {
+          height: 100%;
+        }
+      }
+
+      &[height-range~="441px-"] {
+        .dashboard-panel-slot-table {
+          height: 50%;
+        }
+      }
+
+      .dashboard-panel-slot-table.max {
         width: 100% !important;
         height: 100%;
         padding-top: 0;

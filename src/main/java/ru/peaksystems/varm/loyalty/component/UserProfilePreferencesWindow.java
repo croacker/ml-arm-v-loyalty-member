@@ -200,7 +200,7 @@ public class UserProfilePreferencesWindow extends Window {
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth(100.0f, Unit.PERCENTAGE);
 
-        Button ok = new Button("OK");
+        Button ok = new Button("Сохранить");
         ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
         ok.addClickListener(event -> {
             try {
@@ -222,15 +222,16 @@ public class UserProfilePreferencesWindow extends Window {
             }
 
         });
+        ok.setClickShortcut(KeyCode.ENTER, null);
         ok.focus();
 
         Button cancel = new Button("Отмена");
         cancel.addClickListener(event -> close());
+        cancel.setClickShortcut(KeyCode.ESCAPE, null);
 
-        footer.addComponents(ok, cancel);
+        footer.addComponents(cancel, ok);
         footer.setExpandRatio(cancel, 1);
-//        footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
-        footer.setComponentAlignment(ok, Alignment.TOP_RIGHT);
+        footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
         return footer;
     }

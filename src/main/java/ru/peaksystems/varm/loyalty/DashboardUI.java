@@ -14,6 +14,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.data.DataProvider;
 import ru.peaksystems.varm.loyalty.data.dummy.LoyaltyDataProvider;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoggedOutEvent;
@@ -81,6 +82,11 @@ public final class DashboardUI extends UI {
         for (Window window : getWindows()) {
             window.close();
         }
+    }
+
+    @Subscribe
+    public void cardholderFind(final DashboardEvent.CardholderFindEvent event) {
+
     }
 
     public static DataProvider getDataProvider() {

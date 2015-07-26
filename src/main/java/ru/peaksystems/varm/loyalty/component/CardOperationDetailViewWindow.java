@@ -5,16 +5,15 @@ import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.peak.ml.loyalty.core.data.CardOperation;
-import ru.peak.ml.loyalty.core.data.Holder;
+import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 
-public class OperationDtailViewWindow  extends Window {
+public class CardOperationDetailViewWindow extends Window {
 
     public static final String ID = "operationdtailviewwindow";
 
@@ -42,7 +41,7 @@ public class OperationDtailViewWindow  extends Window {
     @PropertyId("paymentMethod")
     private TextField paymentMethodField;
 
-    public OperationDtailViewWindow(final CardOperation cardOperation){
+    public CardOperationDetailViewWindow(final CardOperation cardOperation){
         addStyleName("profile-window");
         setId(ID);
         Responsive.makeResponsive(this);
@@ -66,7 +65,7 @@ public class OperationDtailViewWindow  extends Window {
         content.addComponent(detailsWrapper);
         content.setExpandRatio(detailsWrapper, 1f);
 
-        detailsWrapper.addComponent(buildProfileTab());
+        detailsWrapper.addComponent(buildDetailTab());
 
         content.addComponent(buildFooter());
         fieldGroup = new BeanFieldGroup<>(CardOperation.class);
@@ -75,7 +74,7 @@ public class OperationDtailViewWindow  extends Window {
         this.cardOperation = cardOperation;
     }
 
-    private Component buildProfileTab() {
+    private Component buildDetailTab() {
         HorizontalLayout root = new HorizontalLayout();
         root.setCaption("Личные данные");
         root.setIcon(FontAwesome.USER);
@@ -84,46 +83,40 @@ public class OperationDtailViewWindow  extends Window {
         root.setMargin(true);
         root.addStyleName("profile-form");
 
-        VerticalLayout pic = new VerticalLayout();
-        pic.setSizeUndefined();
-        pic.setSpacing(true);
-        Image profilePic = new Image(null, new ThemeResource(
-            "img/profile-pic-300px.jpg"));
-        profilePic.setWidth(100.0f, Unit.PIXELS);
-        pic.addComponent(profilePic);
-
-        Button upload = new Button("Загрузить…", event -> {
-            Notification.show("Не реализовано в этой версии");
-        });
-        upload.addStyleName(ValoTheme.BUTTON_TINY);
-        pic.addComponent(upload);
-
-        root.addComponent(pic);
-
         FormLayout details = new FormLayout();
         details.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
         root.addComponent(details);
         root.setExpandRatio(details, 1);
 
         operationDateField = new TextField("Дата и время");
+        operationDateField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(operationDateField);
         operationTypeField = new TextField("Тип");
+        operationTypeField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(operationTypeField);
         sumField = new TextField("Сумма");
+        sumField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(sumField);
         cashbackField = new TextField("Cashback");
+        cashbackField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(cashbackField);
         organizationNameField = new TextField("Партнер");
+        organizationNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(organizationNameField);
         shopNameField = new TextField("ТСП");
+        shopNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(shopNameField);
         legalAddressField = new TextField("Адрес ТСП");
+        legalAddressField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(legalAddressField);
         partOfNumberField = new TextField("Карта участника");
+        partOfNumberField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(partOfNumberField);
         socialCardTypeField = new TextField("Тип социальной карты");
+        socialCardTypeField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(socialCardTypeField);
         paymentMethodField = new TextField("Способ платежа");
+        paymentMethodField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(paymentMethodField);
 
         return root;
@@ -134,19 +127,19 @@ public class OperationDtailViewWindow  extends Window {
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth(100.0f, Unit.PERCENTAGE);
 
-        Button cancel = new Button("Отмена");
-        cancel.addClickListener(event -> close());
+        Button ok = new Button("ОК");
+        ok.addClickListener(event -> close());
 
-        footer.addComponents(cancel);
-        footer.setExpandRatio(cancel, 1);
-        footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+        footer.addComponents(ok);
+        footer.setExpandRatio(ok, 1);
+        footer.setComponentAlignment(ok, Alignment.TOP_RIGHT);
 
         return footer;
     }
 
-    public static void open(final Holder holder) {
+    public static void open(final CardOperation cardOperation) {
         DashboardEventBus.post(new DashboardEvent.CloseOpenWindowsEvent());
-        Window w = new HolderProfilePreferencesWindow(holder);
+        Window w = new CardOperationDetailViewWindow(cardOperation);
         UI.getCurrent().addWindow(w);
         w.focus();
     }

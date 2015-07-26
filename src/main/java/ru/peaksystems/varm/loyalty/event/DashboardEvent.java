@@ -1,9 +1,10 @@
 package ru.peaksystems.varm.loyalty.event;
 
-import java.util.Collection;
-
+import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
 import ru.peaksystems.varm.loyalty.view.DashboardViewType;
+
+import java.util.Collection;
 
 /*
  * Event bus events used in Dashboard are listed here as inner classes.
@@ -80,6 +81,33 @@ public abstract class DashboardEvent {
     }
 
     public static class ProfileUpdatedEvent {
+    }
+
+    public static final class CardholderFindEvent {
+        private final Holder holder;
+
+        public CardholderFindEvent(final Holder holder) {
+            this.holder = holder;
+        }
+
+        public Holder getHolder() {
+            return holder;
+        }
+    }
+
+    public static final class CardholderClearEvent {
+    }
+
+    public static final class CardholderUpdateEvent {
+        private final Holder holder;
+
+        public CardholderUpdateEvent(final Holder holder) {
+            this.holder = holder;
+        }
+
+        public Holder getHolder() {
+            return holder;
+        }
     }
 
 }

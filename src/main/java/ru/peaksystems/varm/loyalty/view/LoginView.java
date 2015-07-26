@@ -55,10 +55,12 @@ public class LoginView extends VerticalLayout {
         fields.addStyleName("fields");
 
         final TextField username = new TextField("Пользователь");
+        username.setValue("admin");
         username.setIcon(FontAwesome.USER);
         username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
         final PasswordField password = new PasswordField("Пароль");
+        password.setValue("admin");
         password.setIcon(FontAwesome.LOCK);
         password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 

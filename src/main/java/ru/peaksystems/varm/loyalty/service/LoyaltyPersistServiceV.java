@@ -9,8 +9,13 @@ import ru.peak.ml.core.model.MlDynamicEntityImpl;
 @Slf4j
 public class LoyaltyPersistServiceV {
 
+    CommonDao commonDao;
+
     public CommonDao getCommonDao() {
-        return GuiceConfigSingleton.inject(CommonDao.class);
+        if (commonDao == null){
+            commonDao = GuiceConfigSingleton.inject(CommonDao.class);
+        }
+        return commonDao;
     }
 
     @Transactional

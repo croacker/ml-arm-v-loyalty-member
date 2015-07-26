@@ -8,18 +8,18 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.component.CardHolderOperationsTable;
+import ru.peaksystems.varm.loyalty.component.CardOperationsTable;
 import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import ru.peaksystems.varm.loyalty.layout.CardholderInfoLayout;
 import ru.peaksystems.varm.loyalty.layout.CardholderSearchLayout;
+import ru.peaksystems.varm.loyalty.layout.LayoutCommand;
+import ru.peaksystems.varm.loyalty.layout.MenuCommandsOwner;
 import ru.peaksystems.varm.loyalty.view.dashboard.DashboardEdit.DashboardEditListener;
 
 import java.util.Collection;
@@ -106,8 +106,8 @@ public final class DashboardView extends Panel implements View,
         result.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
         result.setDescription("Редактировать");
         result.addClickListener(event -> getUI().addWindow(
-                new DashboardEdit(DashboardView.this, titleLabel
-                        .getValue())));
+            new DashboardEdit(DashboardView.this, titleLabel
+                .getValue())));
         return result;
     }
 
@@ -119,7 +119,6 @@ public final class DashboardView extends Panel implements View,
         dashboardPanels.addComponent(buildSearchHolder());
         dashboardPanels.addComponent(buildCardholderInfo());
         dashboardPanels.addComponent(buildTop10TitlesByRevenue());
-//        dashboardPanels.addComponent(buildPopularMovies());
 
         return dashboardPanels;
     }
@@ -133,7 +132,7 @@ public final class DashboardView extends Panel implements View,
     }
 
     private Component buildTop10TitlesByRevenue() {
-        Component contentWrapper = createContentWrapper(new CardHolderOperationsTable());
+        Component contentWrapper = createContentWrapper(new CardOperationsTable());
         contentWrapper.addStyleName("top10-revenue");
         return contentWrapper;
     }
@@ -145,7 +144,12 @@ public final class DashboardView extends Panel implements View,
     private Component createContentWrapper(final Component content) {
         final CssLayout slot = new CssLayout();
         slot.setWidth("100%");
-        slot.addStyleName("dashboard-panel-slot");
+        if(content instanceof Table){
+            slot.addStyleName("dashboard-panel-slot-table");
+        }else {
+            slot.addStyleName("dashboard-panel-slot");
+        }
+
 
         CssLayout card = new CssLayout();
         card.setWidth("100%");
@@ -176,14 +180,17 @@ public final class DashboardView extends Panel implements View,
         });
         max.setStyleName("icon-only");
         MenuItem root = tools.addItem("", FontAwesome.COG, null);
-        root.addItem("Редактировать", selectedItem -> Notification.show("Не реализовано в этой версии"));
-        root.addSeparator();
-        root.addItem("Закрыть", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                Notification.show("Не реализовано в этой версии");
+        if(content instanceof MenuCommandsOwner){
+            MenuCommandsOwner commandsOwner = (MenuCommandsOwner) content;
+            for(LayoutCommand layoutCommand: commandsOwner.getCommands()){
+                root.addItem(layoutCommand.getCaption(),
+                    layoutCommand.getCommand());
             }
-        });
+        }else {
+            root.addItem("Редактировать", selectedItem -> Notification.show("Не реализовано в этой версии"));
+            root.addSeparator();
+            root.addItem("Закрыть", selectedItem -> Notification.show("Не реализовано в этой версии"));
+        }
 
         toolbar.addComponents(caption, tools);
         toolbar.setExpandRatio(caption, 1);
@@ -232,12 +239,9 @@ public final class DashboardView extends Panel implements View,
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth("100%");
         Button showAll = new Button("Все напоминания",
-                new ClickListener() {
-                    @Override
-                    public void buttonClick(final ClickEvent event) {
-                        Notification.show("Не реализовано");
-                    }
-                });
+            event1 -> {
+                Notification.show("Не реализовано");
+            });
         showAll.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
         showAll.addStyleName(ValoTheme.BUTTON_SMALL);
         footer.addComponent(showAll);

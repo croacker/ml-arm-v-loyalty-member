@@ -1,28 +1,53 @@
 package ru.peaksystems.varm.loyalty.layout;
 
+import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.ui.*;
+import ru.ml.core.common.guice.GuiceConfigSingleton;
+import ru.peak.ml.loyalty.core.data.Holder;
+import ru.peak.ml.loyalty.core.data.dao.HolderDao;
+import ru.peak.ml.loyalty.util.StringUtil;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 
-public class CardholderSearchLayout extends VerticalLayout{
+import java.util.List;
+
+public class CardholderSearchLayout extends VerticalLayout implements MenuCommandsOwner{
+
+    private HolderDao holderDao;
+
+    TextField cardNuberField;
+    TextField checkwordField;
+
+    public HolderDao getHolderDao() {
+        if(holderDao == null){
+            holderDao = GuiceConfigSingleton.inject(HolderDao.class);
+        }
+        return holderDao;
+    }
 
     public CardholderSearchLayout(){
         initComponents();
+        DashboardEventBus.register(this);
     }
 
     private void initComponents() {
-
+        setSpacing(true);
         HorizontalLayout layout = new HorizontalLayout();
+        layout.setSpacing(true);
         layout.setWidth("100%");
-        TextField loginField = new TextField();
-        loginField.setWidth("100%");
-        loginField.setInputPrompt("Ноомер социальной карты, либо e-mail");
-        layout.addComponent(loginField);
-        layout.setComponentAlignment(loginField, Alignment.MIDDLE_RIGHT);
-        layout.setExpandRatio(loginField, 1.0f);
+        cardNuberField = new TextField();
+        cardNuberField.setWidth("100%");
+        cardNuberField.setInputPrompt("Ноомер социальной карты, либо e-mail");
+        layout.addComponent(cardNuberField);
+        layout.setComponentAlignment(cardNuberField, Alignment.MIDDLE_RIGHT);
+        layout.setExpandRatio(cardNuberField, 1.0f);
         addComponent(layout);
 
         layout = new HorizontalLayout();
+        layout.setSpacing(true);
         layout.setWidth("100%");
-        TextField checkwordField = new TextField();
+        checkwordField = new TextField();
         checkwordField.setWidth("100%");
         checkwordField.setInputPrompt("Проверочное слово");
         layout.addComponent(checkwordField);
@@ -40,6 +65,33 @@ public class CardholderSearchLayout extends VerticalLayout{
     }
 
     private void search(){
-//        callcenterOperatorDesktop.searchCardholder(getLogin(), getCheckword());
+        if(StringUtil.isEmpty(cardNuberField.getValue()) || StringUtil.isEmpty(checkwordField.getValue())){
+            showError("Необходимо указать Логин и Проверочное слово");
+            return;
+        }
+        Holder holder =  getHolderDao().getBySocialCardNumberAndCheckword(cardNuberField.getValue().trim(), checkwordField.getValue().trim());
+        if(holder == null){
+            showError("Держатель с указанными данными не обнаружен");
+            return;
+        }
+        DashboardEventBus.post(new DashboardEvent.CardholderFindEvent(holder));
     }
+
+    @Override
+    public List<LayoutCommand> getCommands() {
+        List<LayoutCommand> commands = Lists.newArrayList();
+        commands.add(new CardholderClearCommand(this));
+        return commands;
+    }
+
+    @Subscribe
+    public void cardholderClear(final DashboardEvent.CardholderClearEvent event) {
+        cardNuberField.clear();
+        checkwordField.clear();
+    }
+
+    private void showError(String text){
+        Notification.show(text, Notification.Type.ERROR_MESSAGE);
+    }
+
 }

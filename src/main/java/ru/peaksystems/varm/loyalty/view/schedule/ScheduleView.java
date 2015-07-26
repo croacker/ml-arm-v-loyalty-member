@@ -1,41 +1,16 @@
 package ru.peaksystems.varm.loyalty.view.schedule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import com.google.common.eventbus.Subscribe;
-import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.component.MovieDetailsWindow;
-import ru.peaksystems.varm.loyalty.domain.Movie;
-import ru.peaksystems.varm.loyalty.domain.Transaction;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
-import com.vaadin.event.LayoutEvents.LayoutClickEvent;
-import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.MouseEventDetails.MouseButton;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Calendar;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.calendar.CalendarComponentEvents.EventClick;
-import com.vaadin.ui.components.calendar.CalendarComponentEvents.EventClickHandler;
 import com.vaadin.ui.components.calendar.CalendarComponentEvents.EventResize;
 import com.vaadin.ui.components.calendar.CalendarComponentEvents.MoveEvent;
 import com.vaadin.ui.components.calendar.event.CalendarEvent;
@@ -43,6 +18,17 @@ import com.vaadin.ui.components.calendar.event.CalendarEventProvider;
 import com.vaadin.ui.components.calendar.handler.BasicEventMoveHandler;
 import com.vaadin.ui.components.calendar.handler.BasicEventResizeHandler;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.peaksystems.varm.loyalty.DashboardUI;
+import ru.peaksystems.varm.loyalty.component.MovieDetailsWindow;
+import ru.peaksystems.varm.loyalty.domain.Movie;
+import ru.peaksystems.varm.loyalty.domain.Transaction;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public final class ScheduleView extends CssLayout implements View {
@@ -73,13 +59,10 @@ public final class ScheduleView extends CssLayout implements View {
     @Override
     public void detach() {
         super.detach();
-        // A new instance of ScheduleView is created every time it's navigated
-        // to so we'll need to clean up references to it on detach.
         DashboardEventBus.unregister(this);
     }
 
     private void injectMovieCoverStyles() {
-        // Add all movie cover images as classes to CSSInject
         String styles = "";
         for (Movie m : DashboardUI.getDataProvider().getMovies()) {
             WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
@@ -109,14 +92,11 @@ public final class ScheduleView extends CssLayout implements View {
         calendar.setWidth(100.0f, Unit.PERCENTAGE);
         calendar.setHeight(1000.0f, Unit.PIXELS);
 
-        calendar.setHandler(new EventClickHandler() {
-            @Override
-            public void eventClick(final EventClick event) {
-                setTrayVisible(false);
-                MovieEvent movieEvent = (MovieEvent) event.getCalendarEvent();
-                MovieDetailsWindow.open(movieEvent.getMovie(),
-                        movieEvent.getStart(), movieEvent.getEnd());
-            }
+        calendar.setHandler((EventClick event) -> {
+            setTrayVisible(false);
+            MovieEvent movieEvent = (MovieEvent) event.getCalendarEvent();
+            MovieDetailsWindow.open(movieEvent.getMovie(),
+                    movieEvent.getStart(), movieEvent.getEnd());
         });
         calendarLayout.addComponent(calendar);
 
@@ -132,7 +112,6 @@ public final class ScheduleView extends CssLayout implements View {
 
                     Date newFromTime = event.getNewStart();
 
-                    // Update event dates
                     long length = editableEvent.getEnd().getTime()
                             - editableEvent.getStart().getTime();
                     setDates(editableEvent, newFromTime,
@@ -186,12 +165,9 @@ public final class ScheduleView extends CssLayout implements View {
             titleLabel.setWidth(120.0f, Unit.PIXELS);
             frame.addComponent(titleLabel);
 
-            frame.addLayoutClickListener(new LayoutClickListener() {
-                @Override
-                public void layoutClick(final LayoutClickEvent event) {
-                    if (event.getButton() == MouseButton.LEFT) {
-                        MovieDetailsWindow.open(movie, null, null);
-                    }
+            frame.addLayoutClickListener(event -> {
+                if (event.getButton() == MouseButton.LEFT) {
+                    MovieDetailsWindow.open(movie, null, null);
                 }
             });
             catalog.addComponent(frame);
@@ -229,12 +205,7 @@ public final class ScheduleView extends CssLayout implements View {
 
         Button discard = new Button("Discard");
         discard.addClickListener(close);
-        discard.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                calendar.markAsDirty();
-            }
-        });
+        discard.addClickListener(event -> calendar.markAsDirty());
         tray.addComponent(discard);
         tray.setComponentAlignment(discard, Alignment.MIDDLE_LEFT);
         return tray;
@@ -265,12 +236,11 @@ public final class ScheduleView extends CssLayout implements View {
         @Override
         public List<CalendarEvent> getEvents(final Date startDate,
                 final Date endDate) {
-            // Transactions are dynamically fetched from the backend service
-            // when needed.
+
             Collection<Transaction> transactions = DashboardUI
                     .getDataProvider().getTransactionsBetween(startDate,
                             endDate);
-            List<CalendarEvent> result = new ArrayList<CalendarEvent>();
+            List<CalendarEvent> result = new ArrayList<>();
             for (Transaction transaction : transactions) {
                 Movie movie = DashboardUI.getDataProvider().getMovie(
                         transaction.getMovieId());
