@@ -7,6 +7,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peak.ml.loyalty.util.StringUtil;
+import ru.peaksystems.varm.loyalty.component.CardOperationDetailViewWindow;
 import ru.peaksystems.varm.loyalty.component.HolderProfilePreferencesWindow;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
@@ -76,7 +77,6 @@ public class CardholderInfoLayout extends VerticalLayout implements MenuCommands
 
     public void setHolder(Holder holder){
         this.holder = holder;
-        updateComponents();
     }
 
     @Override
@@ -99,16 +99,26 @@ public class CardholderInfoLayout extends VerticalLayout implements MenuCommands
     @Subscribe
     public void cardholderFind(final DashboardEvent.CardholderFindEvent event) {
         setHolder(event.getHolder());
+        updateComponents();
     }
 
     @Subscribe
     public void cardholderClear(final DashboardEvent.CardholderClearEvent event) {
         setHolder(null);
+        updateComponents();
     }
 
     @Subscribe
-    public void cardholderClear(final DashboardEvent.CardholderUpdateEvent event) {
+    public void cardholderUpdate(final DashboardEvent.CardholderUpdateEvent event) {
         setHolder(event.getHolder());
+        updateComponents();
+    }
+
+    @Subscribe
+    public void clickOperation(final DashboardEvent.ClickCardOperationEvent event) {
+        if(event.getCardOperation() != null){
+            CardOperationDetailViewWindow.open(event.getCardOperation());
+        }
     }
 
     private void showError(String text){

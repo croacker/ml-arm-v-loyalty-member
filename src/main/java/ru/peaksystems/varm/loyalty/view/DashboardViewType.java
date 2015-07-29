@@ -7,23 +7,20 @@ import ru.peaksystems.varm.loyalty.view.dashboard.DashboardView;
 
 public enum DashboardViewType {
 
-    DASHBOARD("dashboard", DashboardView.class, FontAwesome.HOME, true)
-//    ,
-//    SALES("sales", DashboardView.class, FontAwesome.BAR_CHART_O, false),
-//    TRANSACTIONS("transactions", TransactionsView.class, FontAwesome.TABLE, false),
-//    REPORTS("reports", ReportsView.class, FontAwesome.FILE_TEXT_O, true),
-//    SCHEDULE("schedule", ScheduleView.class, FontAwesome.CALENDAR_O, false)
+    DASHBOARD("dashboard", "Участники",DashboardView.class, FontAwesome.HOME, true)
     ;
 
     private final String viewName;
+    private final String caption;
     private final Class<? extends View> viewClass;
     private final Resource icon;
     private final boolean stateful;
 
-    private DashboardViewType(final String viewName,
+    private DashboardViewType(final String viewName, String caption,
             final Class<? extends View> viewClass, final Resource icon,
             final boolean stateful) {
         this.viewName = viewName;
+        this.caption = caption;
         this.viewClass = viewClass;
         this.icon = icon;
         this.stateful = stateful;
@@ -35,6 +32,10 @@ public enum DashboardViewType {
 
     public String getViewName() {
         return viewName;
+    }
+
+    public String getCaption() {
+        return caption;
     }
 
     public Class<? extends View> getViewClass() {

@@ -16,10 +16,7 @@ import ru.peaksystems.varm.loyalty.domain.DashboardNotification;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
-import ru.peaksystems.varm.loyalty.layout.CardholderInfoLayout;
-import ru.peaksystems.varm.loyalty.layout.CardholderSearchLayout;
-import ru.peaksystems.varm.loyalty.layout.LayoutCommand;
-import ru.peaksystems.varm.loyalty.layout.MenuCommandsOwner;
+import ru.peaksystems.varm.loyalty.layout.*;
 import ru.peaksystems.varm.loyalty.view.dashboard.DashboardEdit.DashboardEditListener;
 
 import java.util.Collection;

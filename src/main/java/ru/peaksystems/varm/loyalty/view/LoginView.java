@@ -33,7 +33,7 @@ public class LoginView extends VerticalLayout {
         addComponent(loginForm);
         setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
 
-        showNotification("<span>Приложение - проект нового интерфейса для Оператора Call-центра.</span> <span>Ведите имя пользователя и пароль и нажмите <b>Авторизация</b> для того чтобы продолжить.</span>");
+//        showNotification("<span>Приложение - проект нового интерфейса для Оператора Call-центра.</span> <span>Ведите имя пользователя и пароль и нажмите <b>Авторизация</b> для того чтобы продолжить.</span>");
     }
 
     private Component buildLoginForm() {
@@ -60,7 +60,7 @@ public class LoginView extends VerticalLayout {
         username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
         final PasswordField password = new PasswordField("Пароль");
-        password.setValue("admin");
+        password.setValue("Admin896");
         password.setIcon(FontAwesome.LOCK);
         password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 

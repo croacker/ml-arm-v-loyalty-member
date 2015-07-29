@@ -1,5 +1,6 @@
 package ru.peaksystems.varm.loyalty.event;
 
+import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
 import ru.peaksystems.varm.loyalty.view.DashboardViewType;
@@ -110,4 +111,22 @@ public abstract class DashboardEvent {
         }
     }
 
+    /**
+     * Изменился набор операций
+     */
+    public static final class ChangeCardOperationsEvent {
+
+    }
+
+    public static final class ClickCardOperationEvent {
+        CardOperation cardOperation;
+
+        public CardOperation getCardOperation(){
+            return cardOperation;
+        }
+
+        public ClickCardOperationEvent(CardOperation cardOperation){
+            this.cardOperation = cardOperation;
+        }
+    }
 }

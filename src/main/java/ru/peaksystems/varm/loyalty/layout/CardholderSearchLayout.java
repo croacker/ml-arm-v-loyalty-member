@@ -5,8 +5,10 @@ import com.google.common.eventbus.Subscribe;
 import com.vaadin.ui.*;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.Holder;
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peak.ml.loyalty.core.data.dao.HolderDao;
 import ru.peak.ml.loyalty.util.StringUtil;
+import ru.peak.security.dao.MlUserDao;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class CardholderSearchLayout extends VerticalLayout implements MenuCommandsOwner{
 
     private HolderDao holderDao;
+    private MlUserDao mlUserDao;
 
     TextField cardNuberField;
     TextField checkwordField;
@@ -24,6 +27,13 @@ public class CardholderSearchLayout extends VerticalLayout implements MenuComman
             holderDao = GuiceConfigSingleton.inject(HolderDao.class);
         }
         return holderDao;
+    }
+
+    public MlUserDao getUserDao() {
+        if(mlUserDao == null){
+            mlUserDao = GuiceConfigSingleton.inject(MlUserDao.class);
+        }
+        return mlUserDao;
     }
 
     public CardholderSearchLayout(){
@@ -64,17 +74,25 @@ public class CardholderSearchLayout extends VerticalLayout implements MenuComman
         return clickEvent -> search();
     }
 
+    /**
+     *
+     */
     private void search(){
         if(StringUtil.isEmpty(cardNuberField.getValue()) || StringUtil.isEmpty(checkwordField.getValue())){
             showError("Необходимо указать Логин и Проверочное слово");
             return;
         }
-        Holder holder =  getHolderDao().getBySocialCardNumberAndCheckword(cardNuberField.getValue().trim(), checkwordField.getValue().trim());
-        if(holder == null){
-            showError("Держатель с указанными данными не обнаружен");
-            return;
+
+        Holder holder;
+        MlUser user = (MlUser) getUserDao().getUserByLogin(cardNuberField.getValue());
+        if(user != null) {
+            holder = user.getHolder();
+            if (holder == null || !holder.getCheckword().equals(checkwordField.getValue())) {
+                showError("Держатель с указанными данными не обнаружен");
+            }else {
+                DashboardEventBus.post(new DashboardEvent.CardholderFindEvent(holder));
+            }
         }
-        DashboardEventBus.post(new DashboardEvent.CardholderFindEvent(holder));
     }
 
     @Override

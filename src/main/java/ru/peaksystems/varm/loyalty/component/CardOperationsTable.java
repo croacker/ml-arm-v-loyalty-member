@@ -1,6 +1,7 @@
 package ru.peaksystems.varm.loyalty.component;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
@@ -11,10 +12,13 @@ import com.vaadin.ui.themes.ValoTheme;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Equipment;
+import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peak.ml.loyalty.core.data.dao.CardOperationDao;
 import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.DashboardUI;
 import ru.peaksystems.varm.loyalty.domain.MovieRevenue;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import ru.peaksystems.varm.loyalty.layout.LayoutCommand;
 import ru.peaksystems.varm.loyalty.layout.MenuCommandsOwner;
 
@@ -38,6 +42,8 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
     private Map<String, Object> filterParameters;
 
     private CardOperationDao cardOperationDao;
+
+    private Holder holder;
 
     /**
      * Список имен атрибутов (entityFieldName) класса CardOperation для отображения
@@ -68,9 +74,16 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         return cardOperationDao;
     }
 
+    public void setHolder(Holder holder){
+        this.holder = holder;
+    }
+
     @Override
     protected String formatPropertyValue(final Object rowId,
             final Object colId, final Property<?> property) {
+        if(colId.equals("comment")){
+            return StringUtil.EMPTY;
+        }
         String result = super.formatPropertyValue(rowId, colId, property);
         if (colId.equals("sum") || colId.equals("sumLoyalty")) {
             if (property != null && property.getValue() != null) {
@@ -108,48 +121,52 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         addStyleName(ValoTheme.TABLE_NO_STRIPES);
         addStyleName(ValoTheme.TABLE_NO_VERTICAL_LINES);
         addStyleName(ValoTheme.TABLE_SMALL);
-//        setSortEnabled(false);
         setColumnAlignment("referenceNumber", Align.RIGHT);
         setRowHeaderMode(RowHeaderMode.INDEX);
-//        setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
         setSizeFull();
 
         List<MovieRevenue> movieRevenues = new ArrayList<>(
             DashboardUI.getDataProvider().getTotalMovieRevenues());
         Collections.sort(movieRevenues, (o1, o2) -> o2.getRevenue().compareTo(o1.getRevenue()));
 
-        setContainerDataSource(new BeanItemContainer<>(
-            CardOperation.class, getCardOperations()));
+        setContainerDataSource(getDataContainer());
 
         setVisibleColumns(columnTitles.keySet().toArray());
-//        setVisibleColumns(columnTitles.keySet());
         setColumnHeaders(columnTitles.values().toArray(new String[0]));
-//        setColumnExpandRatio("title", 2);
-//        setColumnExpandRatio("revenue", 1);
 
-        setSortContainerPropertyId("referenceNumber");
+        setSortContainerPropertyId("operationTime");
         setSortAscending(false);
 
-        addItemClickListener(itemClickEvent -> showCardOperationDetails((CardOperation) ((BeanItem) itemClickEvent.getItem()).getBean()));
+        addItemClickListener(itemClickEvent -> {
+                    CardOperation cardOperation = (CardOperation) ((BeanItem) itemClickEvent.getItem()).getBean();
+            CardOperationDetailViewWindow.open(cardOperation);
+//                    DashboardEventBus.post(new DashboardEvent.ClickCardOperationEvent(cardOperation));
+                });
+
+        DashboardEventBus.register(this);
     }
 
-    public void updateDatasource(){
-        BeanItemContainer dataContainer = (BeanItemContainer) getDataContainer();
-        dataContainer.removeAllItems();
-        dataContainer.addAll(getCardOperations());
-    }
-
-    private Container getEmptyDatasource(){
-        return getDataContainer();
-    }
-
-    private Container getDataContainer() {
+    private Container getDataContainer(){
         return new BeanItemContainer<>(CardOperation.class);
     }
 
-    private Collection getCardOperations(){
-//        return getCardOperationDao().getByHolder((Holder) filterParameters.get("currentHolder"));
-        return getCardOperationDao().getLast(20);
+    /**
+     * Обновить источник данных
+     */
+    public void updateDataContainer(){
+        BeanItemContainer containerDataSource = (BeanItemContainer) getContainerDataSource();
+        if(containerDataSource.size() != 0) {
+            containerDataSource.removeAllItems();
+        }
+        containerDataSource.addAll(getCardOperations());
+    }
+
+    private List<CardOperation> getCardOperations(){
+        List<CardOperation> cardOperations = Lists.newArrayList();
+        if(holder != null){
+            cardOperations = getCardOperationDao().getByHolder(holder);
+        }
+        return cardOperations;
     }
 
     @Override
@@ -177,5 +194,17 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     private void showError(String text){
         Notification.show(text, Notification.Type.ERROR_MESSAGE);
+    }
+
+    @Subscribe
+    public void cardholderFind(final DashboardEvent.CardholderFindEvent event) {
+        setHolder(event.getHolder());
+        updateDataContainer();
+    }
+
+    @Subscribe
+    public void cardholderClear(final DashboardEvent.CardholderClearEvent event) {
+        setHolder(null);
+        updateDataContainer();
     }
 }
