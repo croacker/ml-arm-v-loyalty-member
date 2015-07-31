@@ -6,6 +6,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ValoTheme;
@@ -30,8 +31,7 @@ import java.util.*;
 @SuppressWarnings("serial")
 public final class CardOperationsTable extends Table implements MenuCommandsOwner {
 
-    protected static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>()
-    {
+    protected static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
         protected DateFormat initialValue() {
             return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         }
@@ -68,46 +68,46 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
     }
 
     public CardOperationDao getCardOperationDao() {
-        if(cardOperationDao == null){
+        if (cardOperationDao == null) {
             cardOperationDao = GuiceConfigSingleton.inject(CardOperationDao.class);
         }
         return cardOperationDao;
     }
 
-    public void setHolder(Holder holder){
+    public void setHolder(Holder holder) {
         this.holder = holder;
     }
 
     @Override
     protected String formatPropertyValue(final Object rowId,
-            final Object colId, final Property<?> property) {
-        if(colId.equals("comment")){
+                                         final Object colId, final Property<?> property) {
+        if (colId.equals("comment")) {
             return StringUtil.EMPTY;
         }
         String result = super.formatPropertyValue(rowId, colId, property);
         if (colId.equals("sum") || colId.equals("sumLoyalty")) {
             if (property != null && property.getValue() != null) {
-                Double r = Double.valueOf((Long)property.getValue());
-                r = r/100;
+                Double r = Double.valueOf((Long) property.getValue());
+                r = r / 100;
                 result = moneyFormat.format(r);
             } else {
                 result = "0,00";
             }
-        }else if(colId.equals("operationTime")){
-            if(property != null && property.getValue() != null) {
+        } else if (colId.equals("operationTime")) {
+            if (property != null && property.getValue() != null) {
                 result = dateFormat.get().format(property.getValue());
-            }else {
+            } else {
                 result = StringUtil.EMPTY;
             }
-        }else if(colId.equals("equipment")){
-            if(property != null && property.getValue() != null) {
+        } else if (colId.equals("equipment")) {
+            if (property != null && property.getValue() != null) {
                 Equipment equipment = (Equipment) property.getValue();
-                if(equipment.getShop() != null){
+                if (equipment.getShop() != null) {
                     result = equipment.getShop().getName();
-                }else {
+                } else {
                     result = StringUtil.EMPTY;
                 }
-            }else {
+            } else {
                 result = StringUtil.EMPTY;
             }
         }
@@ -123,11 +123,9 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         addStyleName(ValoTheme.TABLE_SMALL);
         setColumnAlignment("referenceNumber", Align.RIGHT);
         setRowHeaderMode(RowHeaderMode.INDEX);
+        setSelectable(true);
+        setMultiSelect(false);
         setSizeFull();
-
-        List<MovieRevenue> movieRevenues = new ArrayList<>(
-            DashboardUI.getDataProvider().getTotalMovieRevenues());
-        Collections.sort(movieRevenues, (o1, o2) -> o2.getRevenue().compareTo(o1.getRevenue()));
 
         setContainerDataSource(getDataContainer());
 
@@ -138,32 +136,33 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         setSortAscending(false);
 
         addItemClickListener(itemClickEvent -> {
-                    CardOperation cardOperation = (CardOperation) ((BeanItem) itemClickEvent.getItem()).getBean();
-            CardOperationDetailViewWindow.open(cardOperation);
-//                    DashboardEventBus.post(new DashboardEvent.ClickCardOperationEvent(cardOperation));
-                });
+            if(itemClickEvent.isDoubleClick()) {
+                CardOperation cardOperation = (CardOperation) ((BeanItem) itemClickEvent.getItem()).getBean();
+                CardOperationDetailViewWindow.open(cardOperation);
+            }
+        });
 
         DashboardEventBus.register(this);
     }
 
-    private Container getDataContainer(){
+    private Container getDataContainer() {
         return new BeanItemContainer<>(CardOperation.class);
     }
 
     /**
      * Обновить источник данных
      */
-    public void updateDataContainer(){
+    public void updateDataContainer() {
         BeanItemContainer containerDataSource = (BeanItemContainer) getContainerDataSource();
-        if(containerDataSource.size() != 0) {
+        if (containerDataSource.size() != 0) {
             containerDataSource.removeAllItems();
         }
         containerDataSource.addAll(getCardOperations());
     }
 
-    private List<CardOperation> getCardOperations(){
+    private List<CardOperation> getCardOperations() {
         List<CardOperation> cardOperations = Lists.newArrayList();
-        if(holder != null){
+        if (holder != null) {
             cardOperations = getCardOperationDao().getByHolder(holder);
         }
         return cardOperations;
@@ -171,28 +170,39 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     @Override
     public List<LayoutCommand> getCommands() {
+
         List<LayoutCommand> commands = Lists.newArrayList();
 
         LayoutCommand showFilter = new LayoutCommand(this);
         showFilter.setCaption("Фильтр");
         showFilter.setCommand(menuItem ->
-                CardOperationsFilterWindow.open()
+                        CardOperationsFilterWindow.open()
         );
         commands.add(showFilter);
 
         LayoutCommand clearFilter = new LayoutCommand(this);
         clearFilter.setCaption("Очистить фильтр");
-        clearFilter.setCommand(menuItem -> showError("Не реализовано"));
+        clearFilter.setCommand(menuItem -> {
+            showError("Не реализовано");
+        });
+        commands.add(clearFilter);
+
+        LayoutCommand showOperationData = new LayoutCommand(this);
+        showOperationData.setCaption("Данные операции");
+        showOperationData.setCommand(menuItem -> {
+            CardOperation cardOperation = (CardOperation) getValue();
+            CardOperationDetailViewWindow.open(cardOperation);
+        });
         commands.add(clearFilter);
 
         return commands;
     }
 
-    private void showCardOperationDetails(CardOperation cardOperation){
+    private void showCardOperationDetails(CardOperation cardOperation) {
         CardOperationDetailViewWindow.open(cardOperation);
     }
 
-    private void showError(String text){
+    private void showError(String text) {
         Notification.show(text, Notification.Type.ERROR_MESSAGE);
     }
 

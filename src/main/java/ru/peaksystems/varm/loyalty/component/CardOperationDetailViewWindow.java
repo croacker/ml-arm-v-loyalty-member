@@ -69,9 +69,9 @@ public class CardOperationDetailViewWindow extends Window {
 
         content.addComponent(buildFooter());
         fieldGroup = new BeanFieldGroup<>(CardOperation.class);
-//        fieldGroup.bindMemberFields(this);
-//        fieldGroup.setItemDataSource(cardOperation);
-//        this.cardOperation = cardOperation;
+        fieldGroup.bindMemberFields(this);
+        fieldGroup.setItemDataSource(cardOperation);
+        this.cardOperation = cardOperation;
     }
 
     private Component buildDetailTab() {
@@ -88,36 +88,36 @@ public class CardOperationDetailViewWindow extends Window {
         root.addComponent(details);
         root.setExpandRatio(details, 1);
 
-//        operationDateField = new TextField("Дата и время");
-//        operationDateField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(operationDateField);
-//        operationTypeField = new TextField("Тип");
-//        operationTypeField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(operationTypeField);
-//        sumField = new TextField("Сумма");
-//        sumField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(sumField);
-//        cashbackField = new TextField("Cashback");
-//        cashbackField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(cashbackField);
-//        organizationNameField = new TextField("Партнер");
-//        organizationNameField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(organizationNameField);
-//        shopNameField = new TextField("ТСП");
-//        shopNameField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(shopNameField);
-//        legalAddressField = new TextField("Адрес ТСП");
-//        legalAddressField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(legalAddressField);
-//        partOfNumberField = new TextField("Карта участника");
-//        partOfNumberField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(partOfNumberField);
-//        socialCardTypeField = new TextField("Тип социальной карты");
-//        socialCardTypeField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(socialCardTypeField);
-//        paymentMethodField = new TextField("Способ платежа");
-//        paymentMethodField.setNullRepresentation(StringUtil.EMPTY);
-//        details.addComponent(paymentMethodField);
+        operationDateField = new TextField("Дата и время");
+        operationDateField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(operationDateField);
+        operationTypeField = new TextField("Тип");
+        operationTypeField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(operationTypeField);
+        sumField = new TextField("Сумма");
+        sumField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(sumField);
+        cashbackField = new TextField("Cashback");
+        cashbackField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(cashbackField);
+        organizationNameField = new TextField("Партнер");
+        organizationNameField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(organizationNameField);
+        shopNameField = new TextField("ТСП");
+        shopNameField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(shopNameField);
+        legalAddressField = new TextField("Адрес ТСП");
+        legalAddressField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(legalAddressField);
+        partOfNumberField = new TextField("Карта участника");
+        partOfNumberField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(partOfNumberField);
+        socialCardTypeField = new TextField("Тип социальной карты");
+        socialCardTypeField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(socialCardTypeField);
+        paymentMethodField = new TextField("Способ платежа");
+        paymentMethodField.setNullRepresentation(StringUtil.EMPTY);
+        details.addComponent(paymentMethodField);
 
         return root;
     }
