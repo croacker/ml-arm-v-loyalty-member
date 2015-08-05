@@ -18,7 +18,6 @@ public class CardOperationDetailViewWindow extends Window {
     public static final String ID = "operationdtailviewwindow";
 
     private final BeanFieldGroup<CardOperation> fieldGroup;
-    private CardOperation cardOperation;
 
     @PropertyId("operationDate")
     private TextField operationDateField;
@@ -71,7 +70,6 @@ public class CardOperationDetailViewWindow extends Window {
         fieldGroup = new BeanFieldGroup<>(CardOperation.class);
         fieldGroup.bindMemberFields(this);
         fieldGroup.setItemDataSource(cardOperation);
-        this.cardOperation = cardOperation;
     }
 
     private Component buildDetailTab() {

@@ -6,18 +6,18 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ValoTheme;
+import lombok.Getter;
+import lombok.Setter;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Equipment;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peak.ml.loyalty.core.data.dao.CardOperationDao;
 import ru.peak.ml.loyalty.util.StringUtil;
-import ru.peaksystems.varm.loyalty.DashboardUI;
-import ru.peaksystems.varm.loyalty.domain.MovieRevenue;
+import ru.peaksystems.varm.loyalty.domain.dto.CardOperationFilterParameters;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 import ru.peaksystems.varm.loyalty.layout.LayoutCommand;
@@ -26,7 +26,9 @@ import ru.peaksystems.varm.loyalty.layout.MenuCommandsOwner;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public final class CardOperationsTable extends Table implements MenuCommandsOwner {
@@ -39,24 +41,25 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 
-    private Map<String, Object> filterParameters;
+//    @Getter @Setter
+    private CardOperationFilterParameters cardOperationFilterParameters = new CardOperationFilterParameters();
 
     private CardOperationDao cardOperationDao;
 
     private Holder holder;
 
+    public CardOperationFilterParameters getCardOperationFilterParameters(){
+        return cardOperationFilterParameters;
+    }
+
+    public void setCardOperationFilterParameters(CardOperationFilterParameters cardOperationFilterParameters){
+        this.cardOperationFilterParameters = cardOperationFilterParameters;
+    }
+
     /**
      * Список имен атрибутов (entityFieldName) класса CardOperation для отображения
      */
     private static Map<String, String> columnTitles = new LinkedHashMap<>();
-
-    public Map<String, Object> getFilterParameters() {
-        return filterParameters;
-    }
-
-    public void setFilterParameters(Map<String, Object> filterParameters) {
-        this.filterParameters = filterParameters;
-    }
 
     static {
         columnTitles.put("referenceNumber", "Номер ссылки");
@@ -176,7 +179,7 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         LayoutCommand showFilter = new LayoutCommand(this);
         showFilter.setCaption("Фильтр");
         showFilter.setCommand(menuItem ->
-                        CardOperationsFilterWindow.open()
+                        CardOperationsFilterWindow.open(getCardOperationFilterParameters())
         );
         commands.add(showFilter);
 
@@ -193,7 +196,7 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
             CardOperation cardOperation = (CardOperation) getValue();
             CardOperationDetailViewWindow.open(cardOperation);
         });
-        commands.add(clearFilter);
+        commands.add(showOperationData);
 
         return commands;
     }
@@ -215,6 +218,12 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
     @Subscribe
     public void cardholderClear(final DashboardEvent.CardholderClearEvent event) {
         setHolder(null);
+        updateDataContainer();
+    }
+
+    @Subscribe
+    public void cardOperaionFilterChange(final DashboardEvent.CardOperaionFilterEvent event) {
+        setCardOperationFilterParameters(event.getCardOperationFilterParameters());
         updateDataContainer();
     }
 }

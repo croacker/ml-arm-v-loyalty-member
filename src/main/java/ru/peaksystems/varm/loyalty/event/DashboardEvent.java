@@ -3,6 +3,7 @@ package ru.peaksystems.varm.loyalty.event;
 import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
+import ru.peaksystems.varm.loyalty.domain.dto.CardOperationFilterParameters;
 import ru.peaksystems.varm.loyalty.view.DashboardViewType;
 
 import java.util.Collection;
@@ -128,5 +129,16 @@ public abstract class DashboardEvent {
         public ClickCardOperationEvent(CardOperation cardOperation){
             this.cardOperation = cardOperation;
         }
+    }
+
+    public static final class CardOperaionFilterEvent {
+        private final CardOperationFilterParameters cardOperationFilterParameters;
+
+        public CardOperaionFilterEvent(final CardOperationFilterParameters cardOperationFilterParameters) {
+            this.cardOperationFilterParameters = cardOperationFilterParameters;
+        }
+
+        public CardOperationFilterParameters getCardOperationFilterParameters() {
+            return cardOperationFilterParameters;        }
     }
 }

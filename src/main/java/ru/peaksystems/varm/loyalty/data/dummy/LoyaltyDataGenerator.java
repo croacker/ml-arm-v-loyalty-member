@@ -8,47 +8,30 @@ import java.util.Collection;
 public abstract class LoyaltyDataGenerator {
 
     static String randomFirstName() {
-        String[] names = { "Dave", "Mike", "Katherine", "Jonas", "Linus",
-                "Bob", "Anne", "Minna", "Elisa", "George", "Mathias", "Pekka",
-                "Fredrik", "Kate", "Teppo", "Kim", "Samatha", "Sam", "Linda",
-                "Jo", "Sarah", "Ray", "Michael", "Steve" };
+        String[] names = { "Алексей", "Валентин", "Андрей", "Денис", "Виталий",
+                "Виктор", "Сергей", "Иван", "Илья", "Тимур", "Евгений", "Владимир",
+                "Максим", "Антон", "Кирил", "Александр", "Игорь", "Павел", "Борис",
+                "Валерий", "Василий", "Роман", "Степан", "Николай" };
         return names[(int) (Math.random() * names.length)];
     }
 
     static String randomLastName() {
-        String[] names = { "Smith", "Lehtinen", "Chandler", "Hewlett",
-                "Packard", "Jobs", "Buffet", "Reagan", "Carthy", "Wu",
-                "Johnson", "Williams", "Jones", "Brown", "Davis", "Moore",
-                "Wilson", "Taylor", "Anderson", "Jackson", "White", "Harris",
-                "Martin", "King", "Lee", "Walker", "Wright", "Clark",
-                "Robinson", "Garcia", "Thomas", "Hall", "Lopez", "Scott",
-                "Adams", "Barker", "Morris", "Cook", "Rogers", "Rivera",
-                "Gray", "Price", "Perry", "Powell", "Russell", "Diaz" };
+        String[] names = { "Ковтун", "Палдин", "Рябов", "Филатов",
+                "Веремейчик", "Артеменко", "Миронов", "Линьков", "Мурашов", "Ву",
+                "Семичев", "Розов", "Забабурин", "Козлов", "Баранов", "Чернов",
+                "Литовченко", "Цветков", "Лучин", "Федовров", "Васильев", "Горшенин",
+                "Лушин", "Гук", "Куприн", "Новиков", "Шуклин", "Федоров",
+                "Иванов", "Ивасишин", "Сидоров", "Бубнов", "Аксенов", "Мелкумов",
+                "Окулов", "Тряпкин", "Виноградов", "Лебедев", "Осин", "Шагин",
+                "Онопко", "Гусев", "Кривцов", "Мальцев", "Коноваленко", "Бабаев" };
         return names[(int) (Math.random() * names.length)];
     }
 
-    static String randomCompanyName() {
-
-        String name = randomName();
-        if (Math.random() < 0.03) {
-            name += " Technologies";
-        } else if (Math.random() < 0.02) {
-            name += " Investment";
-        }
-        if (Math.random() < 0.3) {
-            name += " Inc";
-        } else if (Math.random() < 0.2) {
-            name += " Ltd.";
-        }
-
-        return name;
-    }
-
     public static String randomWord(int len, boolean capitalized) {
-        String[] part = { "ger", "ma", "isa", "app", "le", "ni", "ke", "mic",
-                "ro", "soft", "wa", "re", "lo", "gi", "is", "acc", "el", "tes",
-                "la", "ko", "ni", "ka", "so", "ny", "mi", "nol", "ta", "pa",
-                "na", "so", "nic", "sa", "les", "for", "ce" };
+        String[] part = { "гир", "ма", "изо", "при", "ле", "ни", "ке", "мик",
+                "ко", "прог", "ва", "ре", "ло", "гр", "есть", "жо", "эл", "тес",
+                "ла", "ко", "но", "про", "так", "ну", "мы", "ноль", "да", "при",
+                "соб", "рек", "мак", "вер", "ист", "для", "ва" };
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < len; i++) {
             String p = part[(int) (Math.random() * part.length)];

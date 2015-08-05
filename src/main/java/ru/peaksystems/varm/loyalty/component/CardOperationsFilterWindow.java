@@ -2,6 +2,8 @@ package ru.peaksystems.varm.loyalty.component;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ShortcutAction;
@@ -10,8 +12,11 @@ import com.vaadin.server.Responsive;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import lombok.Getter;
+import lombok.Setter;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.Card;
+import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peak.ml.loyalty.core.data.Shop;
 import ru.peak.ml.loyalty.core.data.dao.CardOperationDao;
@@ -19,6 +24,7 @@ import ru.peak.ml.loyalty.core.data.mlenum.CardOperationType;
 import ru.peaksystems.varm.loyalty.component.converter.CardConverter;
 import ru.peaksystems.varm.loyalty.component.converter.OperationTypeConverter;
 import ru.peaksystems.varm.loyalty.component.converter.ShopConverter;
+import ru.peaksystems.varm.loyalty.domain.dto.CardOperationFilterParameters;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
 
@@ -36,6 +42,12 @@ public class CardOperationsFilterWindow extends Window {
     private ComboBox shopCombobox;
     private ComboBox cardCombobox;
 
+    @Getter
+    @Setter
+    private CardOperationFilterParameters cardOperationFilterParameters;
+
+    private final BeanFieldGroup<CardOperationFilterParameters> fieldGroup;
+
     public void setHolder(Holder holder){
         this.holder = holder;
     }
@@ -47,7 +59,7 @@ public class CardOperationsFilterWindow extends Window {
         return cardOperationDao;
     }
 
-    public CardOperationsFilterWindow(){
+    public CardOperationsFilterWindow(CardOperationFilterParameters cardOperationFilterParameters){
         addStyleName("profile-window");
         setId(ID);
         Responsive.makeResponsive(this);
@@ -73,10 +85,11 @@ public class CardOperationsFilterWindow extends Window {
 
         detailsWrapper.addComponent(buildFilterTab());
         content.addComponent(buildFooter());
-    }
 
-    private void updateComponents() {
-
+        fieldGroup = new BeanFieldGroup<>(CardOperationFilterParameters.class);
+        fieldGroup.bindMemberFields(this);
+        fieldGroup.setItemDataSource(cardOperationFilterParameters);
+        this.cardOperationFilterParameters = cardOperationFilterParameters;
     }
 
     private Component buildFilterTab() {
@@ -178,14 +191,25 @@ public class CardOperationsFilterWindow extends Window {
     }
 
     private void aplyFilter() {
+        try {
+            fieldGroup.commit();
+            DashboardEventBus.post(new DashboardEvent.CardOperaionFilterEvent(this.cardOperationFilterParameters));
+            close();
+        } catch (FieldGroup.CommitException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public static void open() {
+    public static void open(CardOperationFilterParameters cardOperationFilterParameters) {
         DashboardEventBus.post(new DashboardEvent.CloseOpenWindowsEvent());
-        Window w = new CardOperationsFilterWindow();
+        Window w = new CardOperationsFilterWindow(cardOperationFilterParameters);
         UI.getCurrent().addWindow(w);
         w.focus();
+    }
+
+    private void updateComponents() {
+
     }
 
     @Subscribe
