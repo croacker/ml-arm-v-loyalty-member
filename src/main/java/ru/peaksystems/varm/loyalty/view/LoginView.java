@@ -8,7 +8,7 @@ import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
-import ru.peak.ml.core.model.security.MlUser;
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoginRequestedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
@@ -98,7 +98,7 @@ public class LoginView extends VerticalLayout {
         } else {
             MlUser user = authenticateMember(userName, password);
             if (user != null) {
-                DashboardEventBus.post(new UserLoginRequestedEvent(userName, password));
+                DashboardEventBus.post(new UserLoginRequestedEvent(user));
             } else {
                 showError("Неверное имя пользователя либо пароль.");
             }

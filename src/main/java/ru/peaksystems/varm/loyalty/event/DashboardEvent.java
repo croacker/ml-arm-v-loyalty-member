@@ -1,33 +1,26 @@
 package ru.peaksystems.varm.loyalty.event;
 
+import lombok.Getter;
 import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Holder;
+import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.domain.Transaction;
 import ru.peaksystems.varm.loyalty.domain.dto.CardOperationFilterParameters;
 import ru.peaksystems.varm.loyalty.view.DashboardViewType;
 
 import java.util.Collection;
 
-/*
- * Event bus events used in Dashboard are listed here as inner classes.
- */
 public abstract class DashboardEvent {
 
     public static final class UserLoginRequestedEvent {
-        private final String userName, password;
+        private final MlUser user;
 
-        public UserLoginRequestedEvent(final String userName,
-                final String password) {
-            this.userName = userName;
-            this.password = password;
+        public MlUser getUser(){
+            return user;
         }
 
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPassword() {
-            return password;
+        public UserLoginRequestedEvent(final MlUser user) {
+            this.user = user;
         }
     }
 

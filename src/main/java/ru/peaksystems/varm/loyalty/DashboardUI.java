@@ -14,6 +14,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.MlUser;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
+import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoginRequestedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoggedOutEvent;
@@ -71,9 +72,8 @@ public final class DashboardUI extends UI {
     }
 
     @Subscribe
-    public void userLoginRequested(final DashboardEvent.UserLoginRequestedEvent event) {
-        MlUser user = getSecurityService().authenticateMember(event.getUserName(),
-                event.getPassword());
+    public void userLoginRequested(final UserLoginRequestedEvent event) {
+        MlUser user = event.getUser();
         VaadinSession.getCurrent().setAttribute(MlUser.class.getName(), user);
         updateContent();
     }
