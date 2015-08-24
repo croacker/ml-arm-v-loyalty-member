@@ -4,6 +4,14 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>QuickTickets Dashboard</display-name>
 
+	<listener>
+		<listener-class>ru.peaksystems.varm.servlet.GuiceListenerV</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>ru.peaksystems.varm.servlet.MlBootstrapListenerV</listener-class>
+	</listener>
+
 	<context-param>
 		<description>Vaadin production mode</description>
 		<param-name>productionMode</param-name>

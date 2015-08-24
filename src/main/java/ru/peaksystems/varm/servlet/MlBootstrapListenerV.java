@@ -14,7 +14,6 @@ import javax.servlet.annotation.WebListener;
  *
  */
 @Slf4j
-@WebListener
 public class MlBootstrapListenerV implements ServletContextListener {
 
   @Override

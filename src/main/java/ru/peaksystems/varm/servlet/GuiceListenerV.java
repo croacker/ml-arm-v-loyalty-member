@@ -9,7 +9,6 @@ import javax.servlet.annotation.WebListener;
  *
  */
 @Slf4j
-@WebListener
 public class GuiceListenerV extends GuiceListener {
 
 
