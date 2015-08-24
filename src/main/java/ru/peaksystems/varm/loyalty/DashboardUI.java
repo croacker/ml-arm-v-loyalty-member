@@ -11,15 +11,14 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.MlUser;
-import ru.peaksystems.varm.loyalty.data.DataProvider;
-import ru.peaksystems.varm.loyalty.data.dummy.LoyaltyDataProvider;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.BrowserResizeEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.CloseOpenWindowsEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoggedOutEvent;
-import ru.peaksystems.varm.loyalty.event.DashboardEvent.UserLoginRequestedEvent;
 import ru.peaksystems.varm.loyalty.event.DashboardEventBus;
+import ru.peaksystems.varm.loyalty.service.SecurityServiceV;
 import ru.peaksystems.varm.loyalty.view.LoginView;
 import ru.peaksystems.varm.loyalty.view.MainView;
 
@@ -31,8 +30,16 @@ import java.util.Locale;
 @SuppressWarnings("serial")
 public final class DashboardUI extends UI {
 
-    private final DataProvider dataProvider = new LoyaltyDataProvider();
     private final DashboardEventBus dashboardEventbus = new DashboardEventBus();
+
+    private SecurityServiceV securityService;
+
+    private SecurityServiceV getSecurityService() {
+        if (securityService == null) {
+            securityService = GuiceConfigSingleton.inject(SecurityServiceV.class);
+        }
+        return securityService;
+    }
 
     @Override
     protected void init(final VaadinRequest request) {
@@ -64,8 +71,8 @@ public final class DashboardUI extends UI {
     }
 
     @Subscribe
-    public void userLoginRequested(final UserLoginRequestedEvent event) {
-        MlUser user = getDataProvider().authenticate(event.getUserName(),
+    public void userLoginRequested(final DashboardEvent.UserLoginRequestedEvent event) {
+        MlUser user = getSecurityService().authenticateMember(event.getUserName(),
                 event.getPassword());
         VaadinSession.getCurrent().setAttribute(MlUser.class.getName(), user);
         updateContent();
@@ -87,10 +94,6 @@ public final class DashboardUI extends UI {
     @Subscribe
     public void cardholderFind(final DashboardEvent.CardholderFindEvent event) {
 
-    }
-
-    public static DataProvider getDataProvider() {
-        return ((DashboardUI) getCurrent()).dataProvider;
     }
 
     public static DashboardEventBus getDashboardEventbus() {

@@ -28,12 +28,9 @@ public class LoginView extends VerticalLayout {
 
     public LoginView() {
         setSizeFull();
-
         Component loginForm = buildLoginForm();
         addComponent(loginForm);
         setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
-
-//        showNotification("<span>Приложение - проект нового интерфейса для Оператора Call-центра.</span> <span>Ведите имя пользователя и пароль и нажмите <b>Авторизация</b> для того чтобы продолжить.</span>");
     }
 
     private Component buildLoginForm() {
