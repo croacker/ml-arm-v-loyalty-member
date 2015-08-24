@@ -9,6 +9,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.peak.ml.loyalty.core.data.MlUser;
+import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.DashboardUI;
 import ru.peaksystems.varm.loyalty.component.UserProfilePreferencesWindow;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent.*;
@@ -139,8 +140,7 @@ public final class DashboardMenu extends CustomComponent {
     }
 
     @Subscribe
-    public void updateNotificationsCount(
-            final NotificationsCountUpdatedEvent event) {
+    public void updateNotificationsCount(final NotificationsCountUpdatedEvent event) {
     }
 
     @Subscribe
@@ -152,7 +152,16 @@ public final class DashboardMenu extends CustomComponent {
     @Subscribe
     public void updateUserName(final ProfileUpdatedEvent event) {
         MlUser user = getCurrentUser();
-        settingsItem.setText(user.getFirstName() + " " + user.getLastName());
+        String settingsItemCaption;
+        if(StringUtil.isEmpty(user.getFirstName())
+                && StringUtil.isEmpty(user.getLastName())){
+            settingsItemCaption = user.getLogin();
+        }else {
+            settingsItemCaption = (StringUtil.isEmpty(user.getFirstName()) ? StringUtil.EMPTY : user.getFirstName())
+                    + " "
+                    + (StringUtil.isEmpty(user.getLastName()) ? StringUtil.EMPTY : user.getLastName());
+        }
+        settingsItem.setText(settingsItemCaption);
     }
 
     public final class ValoMenuItemButton extends Button {
@@ -165,8 +174,7 @@ public final class DashboardMenu extends CustomComponent {
             this.view = view;
             setPrimaryStyleName("valo-menu-item");
             setIcon(view.getIcon());
-            setCaption(view.getCaption().substring(0, 1).toUpperCase()
-                    + view.getViewName().substring(1));
+            setCaption(view.getCaption().toUpperCase());
             DashboardEventBus.register(this);
             addClickListener(event -> UI.getCurrent().getNavigator()
                     .navigateTo(view.getViewName()));
