@@ -9,8 +9,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ValoTheme;
-import lombok.Getter;
-import lombok.Setter;
 import ru.ml.core.common.guice.GuiceConfigSingleton;
 import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Equipment;
@@ -41,7 +39,6 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 
-//    @Getter @Setter
     private CardOperationFilterParameters cardOperationFilterParameters = new CardOperationFilterParameters();
 
     private CardOperationDao cardOperationDao;

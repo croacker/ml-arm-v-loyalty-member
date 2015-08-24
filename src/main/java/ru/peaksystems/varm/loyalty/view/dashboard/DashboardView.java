@@ -51,7 +51,7 @@ public final class DashboardView extends Panel implements View,
 
         dashboardPanels.addComponent(buildSearchHolder());
         dashboardPanels.addComponent(buildCardholderInfo());
-        dashboardPanels.addComponent(buildTop10TitlesByRevenue());
+        dashboardPanels.addComponent(buildCardOperationsTable());
 
         return dashboardPanels;
     }
@@ -61,11 +61,11 @@ public final class DashboardView extends Panel implements View,
     }
 
     private Component buildCardholderInfo() {
-        return createContentWrapper(new CardholderInfoLayout());
+        return createExpandableContentWrapper(new CardholderInfoLayout());
     }
 
-    private Component buildTop10TitlesByRevenue() {
-        Component contentWrapper = createContentWrapper(new CardOperationsTable());
+    private Component buildCardOperationsTable() {
+        Component contentWrapper = createExpandableContentWrapper(new CardOperationsTable());
         contentWrapper.addStyleName("top10-revenue");
         return contentWrapper;
     }
@@ -79,6 +79,50 @@ public final class DashboardView extends Panel implements View,
             slot.addStyleName("dashboard-panel-slot");
         }
 
+        CssLayout card = new CssLayout();
+        card.setWidth("100%");
+        card.addStyleName(ValoTheme.LAYOUT_CARD);
+
+        HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.addStyleName("dashboard-panel-toolbar");
+        toolbar.setWidth("100%");
+
+        Label caption = new Label(content.getCaption());
+        caption.addStyleName(ValoTheme.LABEL_H4);
+        caption.addStyleName(ValoTheme.LABEL_COLORED);
+        caption.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        content.setCaption(null);
+
+        MenuBar tools = new MenuBar();
+        tools.addStyleName(ValoTheme.MENUBAR_BORDERLESS);
+
+        MenuItem root = tools.addItem("", FontAwesome.COG, null);
+        if(content instanceof MenuCommandsOwner){
+            MenuCommandsOwner commandsOwner = (MenuCommandsOwner) content;
+            for(LayoutCommand layoutCommand: commandsOwner.getCommands()){
+                root.addItem(layoutCommand.getCaption(),
+                        layoutCommand.getCommand());
+            }
+        }
+
+        toolbar.addComponents(caption, tools);
+        toolbar.setExpandRatio(caption, 1);
+        toolbar.setComponentAlignment(caption, Alignment.MIDDLE_LEFT);
+
+        card.addComponents(toolbar, content);
+        slot.addComponent(card);
+        return slot;
+    }
+
+    private Component createExpandableContentWrapper(final Component content) {
+
+        final CssLayout slot = new CssLayout();
+        slot.setWidth("100%");
+        if(content instanceof Table){
+            slot.addStyleName("dashboard-panel-slot-table");
+        }else {
+            slot.addStyleName("dashboard-panel-slot");
+        }
 
         CssLayout card = new CssLayout();
         card.setWidth("100%");
@@ -108,6 +152,7 @@ public final class DashboardView extends Panel implements View,
             }
         });
         max.setStyleName("icon-only");
+
         MenuItem root = tools.addItem("", FontAwesome.COG, null);
         if(content instanceof MenuCommandsOwner){
             MenuCommandsOwner commandsOwner = (MenuCommandsOwner) content;
@@ -115,10 +160,6 @@ public final class DashboardView extends Panel implements View,
                 root.addItem(layoutCommand.getCaption(),
                     layoutCommand.getCommand());
             }
-        }else {
-            root.addItem("Редактировать", selectedItem -> Notification.show("Не реализовано в этой версии"));
-            root.addSeparator();
-            root.addItem("Закрыть", selectedItem -> Notification.show("Не реализовано в этой версии"));
         }
 
         toolbar.addComponents(caption, tools);
