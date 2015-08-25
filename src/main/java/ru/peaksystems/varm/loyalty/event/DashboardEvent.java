@@ -78,6 +78,9 @@ public abstract class DashboardEvent {
     public static class ProfileUpdatedEvent {
     }
 
+    /**
+     * Событие - найден держатель
+     */
     public static final class CardholderFindEvent {
         private final Holder holder;
 

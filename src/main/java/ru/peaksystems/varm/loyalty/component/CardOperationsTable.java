@@ -1,6 +1,7 @@
 package ru.peaksystems.varm.loyalty.component;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -14,6 +15,7 @@ import ru.peak.ml.loyalty.core.data.CardOperation;
 import ru.peak.ml.loyalty.core.data.Equipment;
 import ru.peak.ml.loyalty.core.data.Holder;
 import ru.peak.ml.loyalty.core.data.dao.CardOperationDao;
+import ru.peak.ml.loyalty.core.service.CardsOperationsService;
 import ru.peak.ml.loyalty.util.StringUtil;
 import ru.peaksystems.varm.loyalty.domain.dto.CardOperationFilterParameters;
 import ru.peaksystems.varm.loyalty.event.DashboardEvent;
@@ -27,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public final class CardOperationsTable extends Table implements MenuCommandsOwner {
@@ -39,18 +42,27 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 
-    private CardOperationFilterParameters cardOperationFilterParameters = new CardOperationFilterParameters();
+    private CardOperationFilterParameters filterParameters = new CardOperationFilterParameters();
 
     private CardOperationDao cardOperationDao;
 
     private Holder holder;
 
-    public CardOperationFilterParameters getCardOperationFilterParameters(){
-        return cardOperationFilterParameters;
+    private CardsOperationsService cardsOperationsService;
+
+    public CardOperationFilterParameters getFilterParameters(){
+        return filterParameters;
     }
 
-    public void setCardOperationFilterParameters(CardOperationFilterParameters cardOperationFilterParameters){
-        this.cardOperationFilterParameters = cardOperationFilterParameters;
+    public void setFilterParameters(CardOperationFilterParameters cardOperationFilterParameters){
+        this.filterParameters = cardOperationFilterParameters;
+    }
+
+    public CardsOperationsService getCardsOperationsService() {
+        if(cardsOperationsService == null){
+            cardsOperationsService = GuiceConfigSingleton.inject(CardsOperationsService.class);
+        }
+        return cardsOperationsService;
     }
 
     /**
@@ -152,18 +164,82 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
     /**
      * Обновить источник данных
      */
-    public void updateDataContainer() {
+    private void updateDataContainer() {
         BeanItemContainer containerDataSource = (BeanItemContainer) getContainerDataSource();
         if (containerDataSource.size() != 0) {
             containerDataSource.removeAllItems();
         }
-        containerDataSource.addAll(getCardOperations());
+        List<CardOperation> cardOperations = getCardOperations();
+        containerDataSource.addAll(cardOperations);
+        updateFilterParameters(cardOperations);
+    }
+
+    /**
+     * Обновить в параметрах фильтрации список карт и магазинов
+     */
+    private void updateFilterParameters(List<CardOperation> cardOperations){
+        if(filterParameters.getHolder() != holder) {//TODO плохое решение
+            List<CardOperation> workList = Lists.newArrayList(cardOperations);
+            filterParameters.setAvailableShops(
+                    workList.stream().map(co -> co.getEquipment().getShop()).distinct().collect(Collectors.toList()));
+            filterParameters.setAvailableСards(holder != null ? holder.getCards() : Lists.newArrayList());
+
+            filterParameters.setHolder(holder);
+        }
     }
 
     private List<CardOperation> getCardOperations() {
         List<CardOperation> cardOperations = Lists.newArrayList();
         if (holder != null) {
-            cardOperations = getCardOperationDao().getByHolder(holder);
+            Map<String, CardsOperationsService.QueParameter> queParameters = Maps.newHashMap();
+
+            CardsOperationsService.QueParameter queParameter = new CardsOperationsService.QueParameter();
+            queParameter.field = "card.holder";
+            queParameter.expression = " = ";
+            queParameter.value = holder;
+            queParameters.put("holder", queParameter);
+
+            if(getFilterParameters().getBeginDate() != null){
+                queParameter = new CardsOperationsService.QueParameter();
+                queParameter.field = "operation_time";
+                queParameter.expression = " > ";
+                queParameter.value = getFilterParameters().getBeginDate();
+                queParameters.put("beginDate", queParameter);
+            }
+
+            if(getFilterParameters().getEndDate() != null){
+                queParameter = new CardsOperationsService.QueParameter();
+                queParameter.field = "operation_time";
+                queParameter.expression = " < ";
+                queParameter.value = getFilterParameters().getEndDate();
+                queParameters.put("endDate", queParameter);
+            }
+
+            if(!StringUtil.isEmpty(getFilterParameters().getOperationType())){
+                queParameter = new CardsOperationsService.QueParameter();
+                queParameter.field = "operation_type";
+                queParameter.expression = " = ";
+                queParameter.value = "'" + getFilterParameters().getOperationType() + "'";
+                queParameters.put("operation_type", queParameter);
+            }
+
+            if(getFilterParameters().getShop() != null){
+                queParameter = new CardsOperationsService.QueParameter();
+                queParameter.field = "equipment.shop";
+                queParameter.expression = " = ";
+                queParameter.value = getFilterParameters().getShop();
+                queParameters.put("shop", queParameter);
+            }
+
+            if(getFilterParameters().getCard() != null){
+                queParameter = new CardsOperationsService.QueParameter();
+                queParameter.field = "card";
+                queParameter.expression = " = ";
+                queParameter.value = getFilterParameters().getCard();
+                queParameters.put("card", queParameter);
+            }
+
+            cardOperations = getCardsOperationsService().getByParameters(queParameters);
         }
         return cardOperations;
     }
@@ -176,14 +252,15 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
         LayoutCommand showFilter = new LayoutCommand(this);
         showFilter.setCaption("Фильтр");
         showFilter.setCommand(menuItem ->
-                        CardOperationsFilterWindow.open(getCardOperationFilterParameters())
+                        CardOperationsFilterWindow.open(getFilterParameters())
         );
         commands.add(showFilter);
 
         LayoutCommand clearFilter = new LayoutCommand(this);
         clearFilter.setCaption("Очистить фильтр");
         clearFilter.setCommand(menuItem -> {
-            showError("Не реализовано");
+            filterParameters.clear();
+            updateDataContainer();
         });
         commands.add(clearFilter);
 
@@ -220,7 +297,9 @@ public final class CardOperationsTable extends Table implements MenuCommandsOwne
 
     @Subscribe
     public void cardOperaionFilterChange(final DashboardEvent.CardOperaionFilterEvent event) {
-        setCardOperationFilterParameters(event.getCardOperationFilterParameters());
+        setFilterParameters(event.getCardOperationFilterParameters());
         updateDataContainer();
     }
+
+
 }

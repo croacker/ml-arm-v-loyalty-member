@@ -115,6 +115,7 @@ public class HolderProfilePreferencesWindow extends Window {
         root.setExpandRatio(details, 1);
 
         socialCardNumberField = new TextField("Номер социальной карты");
+        socialCardNumberField.setReadOnly(true);
         socialCardNumberField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(socialCardNumberField);
         lastNameField = new TextField("Фамилия");
@@ -127,6 +128,7 @@ public class HolderProfilePreferencesWindow extends Window {
         secondNameField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(secondNameField);
         emailField = new TextField("Email");
+        emailField.setReadOnly(true);
         emailField.setNullRepresentation(StringUtil.EMPTY);
         details.addComponent(emailField);
         phoneField = new TextField("Телефон");

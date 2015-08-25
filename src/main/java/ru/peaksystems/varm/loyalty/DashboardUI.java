@@ -32,6 +32,7 @@ import java.util.Locale;
 public final class DashboardUI extends UI {
 
     private final DashboardEventBus dashboardEventbus = new DashboardEventBus();
+    private static Locale RUSSIAN_LOCALE = new Locale("ru");
 
     private SecurityServiceV securityService;
 
@@ -44,7 +45,7 @@ public final class DashboardUI extends UI {
 
     @Override
     protected void init(final VaadinRequest request) {
-        setLocale(Locale.US);
+        setLocale(RUSSIAN_LOCALE);
 
         DashboardEventBus.register(this);
         Responsive.makeResponsive(this);

@@ -9,7 +9,7 @@
 	<properties>
 		<java.compiler.version>1.8</java.compiler.version>
 		<productionMode>false</productionMode>
-		<vaadin.version>7.5.2</vaadin.version>
+		<vaadin.version>7.5.3</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

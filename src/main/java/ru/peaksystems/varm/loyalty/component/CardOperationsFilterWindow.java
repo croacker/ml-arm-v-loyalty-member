@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ShortcutAction;
@@ -36,30 +37,34 @@ public class CardOperationsFilterWindow extends Window {
 
     private CardOperationDao cardOperationDao;
 
+    @PropertyId("beginDate")
     private DateField beginDate;
+    @PropertyId("endDate")
     private DateField endDate;
+    @PropertyId("operationType")
     private ComboBox operationTypeCombobox;
+    @PropertyId("shop")
     private ComboBox shopCombobox;
+    @PropertyId("card")
     private ComboBox cardCombobox;
 
-    @Getter
-    @Setter
     private CardOperationFilterParameters cardOperationFilterParameters;
 
     private final BeanFieldGroup<CardOperationFilterParameters> fieldGroup;
 
-    public void setHolder(Holder holder){
+    public void setHolder(Holder holder) {
         this.holder = holder;
     }
 
     public CardOperationDao getCardOperationDao() {
-        if(cardOperationDao == null){
+        if (cardOperationDao == null) {
             cardOperationDao = GuiceConfigSingleton.inject(CardOperationDao.class);
         }
         return cardOperationDao;
     }
 
-    public CardOperationsFilterWindow(CardOperationFilterParameters cardOperationFilterParameters){
+    public CardOperationsFilterWindow(CardOperationFilterParameters cardOperationFilterParameters) {
+        this.cardOperationFilterParameters = cardOperationFilterParameters;
         addStyleName("profile-window");
         setId(ID);
         Responsive.makeResponsive(this);
@@ -89,7 +94,6 @@ public class CardOperationsFilterWindow extends Window {
         fieldGroup = new BeanFieldGroup<>(CardOperationFilterParameters.class);
         fieldGroup.bindMemberFields(this);
         fieldGroup.setItemDataSource(cardOperationFilterParameters);
-        this.cardOperationFilterParameters = cardOperationFilterParameters;
     }
 
     private Component buildFilterTab() {
@@ -146,7 +150,7 @@ public class CardOperationsFilterWindow extends Window {
         return footer;
     }
 
-    private ComboBox getOperationTypeCombobox(){
+    private ComboBox getOperationTypeCombobox() {
         ComboBox comboBox = new ComboBox("Тип операции");
         BeanItemContainer<CardOperationType> itemContainer = new BeanItemContainer<>(CardOperationType.class);
         itemContainer.addAll(Lists.newArrayList(CardOperationType.values()));
@@ -160,33 +164,29 @@ public class CardOperationsFilterWindow extends Window {
         return comboBox;
     }
 
-    private ComboBox getShopCombobox(){
+    private ComboBox getShopCombobox() {
         ComboBox comboBox = new ComboBox("ТСП");
-        if(holder != null){
-            BeanItemContainer<Shop> itemContainer = new BeanItemContainer<>(Shop.class);
-            itemContainer.addAll(getCardOperationDao().getDistinctShops(holder));
-            comboBox.setImmediate(true);
-            comboBox.setContainerDataSource(itemContainer);
-            comboBox.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
-            comboBox.setItemCaptionPropertyId("name");
-            Converter converter = new ShopConverter();
-            comboBox.setConverter(converter);
-        }
+        BeanItemContainer<Shop> itemContainer = new BeanItemContainer<>(Shop.class);
+        itemContainer.addAll(cardOperationFilterParameters.getAvailableShops());
+        comboBox.setImmediate(true);
+        comboBox.setContainerDataSource(itemContainer);
+        comboBox.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        comboBox.setItemCaptionPropertyId("name");
+        Converter converter = new ShopConverter(cardOperationFilterParameters.getAvailableShops());
+        comboBox.setConverter(converter);
         return comboBox;
     }
 
-    private ComboBox getCardCombobox(){
+    private ComboBox getCardCombobox() {
         ComboBox comboBox = new ComboBox("Карта");
-        if(holder != null){
-            BeanItemContainer<Card> itemContainer = new BeanItemContainer<>(Card.class);
-            itemContainer.addAll(holder.getCards());
-            comboBox.setImmediate(true);
-            comboBox.setContainerDataSource(itemContainer);
-            comboBox.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
-            comboBox.setItemCaptionPropertyId("panHashNumber");
-            Converter converter = new CardConverter();
-            comboBox.setConverter(converter);
-        }
+        BeanItemContainer<Card> itemContainer = new BeanItemContainer<>(Card.class);
+        itemContainer.addAll(cardOperationFilterParameters.getAvailableСards());
+        comboBox.setImmediate(true);
+        comboBox.setContainerDataSource(itemContainer);
+        comboBox.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        comboBox.setItemCaptionPropertyId("panHashNumber");
+        Converter converter = new CardConverter(cardOperationFilterParameters.getAvailableСards());
+        comboBox.setConverter(converter);
         return comboBox;
     }
 
